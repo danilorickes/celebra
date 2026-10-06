@@ -27,10 +27,20 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter var', 'SF Pro Display', 'system-ui', 'sans-serif'],
+        sans: ['Inter var', 'Roboto', 'SF Pro Display', 'system-ui', 'sans-serif'],
         display: ['SF Pro Display', 'Inter var', 'system-ui', 'sans-serif'],
+        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
       colors: {
+        celebra: {
+          bg: '#0F0E0D',
+          surface: '#1A1816',
+          elevated: '#23201C',
+          border: '#332E27',
+          gold: '#C5A45F',
+          goldHover: '#B08F4A',
+          goldLight: '#E5C989',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -92,8 +102,9 @@ export default {
         height: 'height',
       },
       boxShadow: {
-        subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
-        elevation: '0 4px 20px rgba(0, 0, 0, 0.05)',
+        subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.25)',
+        elevation: '0 8px 30px rgba(0, 0, 0, 0.5)',
+        goldGlow: '0 0 25px -5px rgba(197, 164, 95, 0.35)',
       },
       transitionTimingFunction: {
         apple: 'cubic-bezier(0.42, 0, 0.58, 1)',

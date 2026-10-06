@@ -165,14 +165,22 @@ export default function Teams() {
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
               <ShieldCheck className="w-4 h-4" /> Gestão Operacional
             </div>
-            <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-[#1C1A17]">
+            <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white">
               Equipes de Apoio & Staff ({teams.length})
             </h1>
-            <p className="text-sm text-[#6B6356] mt-1">
-              Conceito operacional: <strong>HUGO → LÍDER → EQUIPE</strong>. Alertas e confirmações
-              fluem pelos líderes.
+            <p className="text-sm text-neutral-400 mt-1">
+              Conceito operacional:{' '}
+              <strong className="text-[#C5A45F]">HUGO → LÍDER → EQUIPE</strong>. Alertas e
+              confirmações fluem pelos líderes.
             </p>
           </div>
+
+          <Button
+            onClick={() => setIsTeamDialogOpen(true)}
+            className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold gap-2 shadow-elevation shrink-0 rounded-xl"
+          >
+            <Plus className="w-4 h-4" /> Nova Equipe
+          </Button>
         </div>
 
         {isLoading ? (
@@ -189,14 +197,17 @@ export default function Teams() {
               return (
                 <Card
                   key={team.id}
-                  className="bg-white border-neutral-200 shadow-sm hover:border-[#C5A45F] transition-all flex flex-col justify-between"
+                  className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation hover:border-[#C5A45F] transition-all flex flex-col justify-between rounded-2xl"
                 >
-                  <CardHeader className="p-4 pb-2 border-b border-neutral-100">
+                  <CardHeader className="p-4 pb-2 border-b border-[#25201A]">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="font-serif font-bold text-base text-[#1C1A17] tracking-wide">
+                      <CardTitle className="font-serif font-bold text-base text-white tracking-wide">
                         {team.name}
                       </CardTitle>
-                      <Badge variant="outline" className="text-[10px] font-semibold text-[#6B6356]">
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] font-semibold text-neutral-400 border-[#332D24]"
+                      >
                         {teamMembers.length} pessoas
                       </Badge>
                     </div>
@@ -205,7 +216,7 @@ export default function Teams() {
                   <CardContent className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
                       {/* Leader Card */}
-                      <div className="bg-[#1C1A17] text-white p-2.5 rounded-lg text-xs flex items-center justify-between">
+                      <div className="bg-[#1C1813] text-white p-2.5 rounded-xl text-xs flex items-center justify-between border border-[#383125]">
                         <div className="flex items-center gap-2">
                           <Crown className="w-4 h-4 text-[#C5A45F] shrink-0" />
                           <div>
@@ -231,22 +242,22 @@ export default function Teams() {
 
                       {/* Members list */}
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-[#6B6356] tracking-wider block mb-1">
+                        <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider block mb-1">
                           Integrantes da Equipe:
                         </span>
                         {regularMembers.length === 0 ? (
-                          <p className="text-xs text-neutral-400 italic">Sem outros membros</p>
+                          <p className="text-xs text-neutral-500 italic">Sem outros membros</p>
                         ) : (
                           <div className="space-y-1">
                             {regularMembers.map((m) => (
                               <div
                                 key={m.id}
-                                className="flex items-center justify-between text-xs p-1.5 rounded bg-neutral-50 border border-neutral-100"
+                                className="flex items-center justify-between text-xs p-2 rounded-lg bg-[#1C1915] border border-[#2B2620]"
                               >
-                                <span className="text-neutral-800 font-medium">{m.name}</span>
+                                <span className="text-neutral-200 font-medium">{m.name}</span>
                                 <button
                                   onClick={() => handleDeleteMember(m.id, m.name)}
-                                  className="text-neutral-400 hover:text-red-600 p-0.5"
+                                  className="text-neutral-500 hover:text-red-400 p-0.5"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
@@ -258,7 +269,7 @@ export default function Teams() {
                     </div>
 
                     {/* Add Member Button */}
-                    <div className="pt-2 border-t border-neutral-100">
+                    <div className="pt-2 border-t border-[#25201A]">
                       <Button
                         variant="outline"
                         size="sm"
@@ -268,7 +279,7 @@ export default function Teams() {
                           setMemberRole(leader ? 'MEMBER' : 'LEADER')
                           setIsMemberDialogOpen(true)
                         }}
-                        className="w-full text-xs h-8 border-dashed border-neutral-300 text-[#C5A45F] hover:text-[#B08F4A] hover:bg-neutral-50 gap-1"
+                        className="w-full text-xs h-8 border-dashed border-[#383125] text-[#C5A45F] hover:text-[#E5C989] hover:bg-[#1E1B16] gap-1 rounded-xl"
                       >
                         <Plus className="w-3 h-3" /> Adicionar Integrante
                       </Button>
@@ -288,10 +299,10 @@ export default function Teams() {
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
               <Truck className="w-4 h-4" /> Parceiros Operacionais
             </div>
-            <h2 className="text-xl lg:text-2xl font-serif font-bold tracking-tight text-[#1C1A17]">
+            <h2 className="text-xl lg:text-2xl font-serif font-bold tracking-tight text-white">
               Fornecedores ({suppliers.length})
             </h2>
-            <p className="text-sm text-[#6B6356] mt-1">
+            <p className="text-sm text-neutral-400 mt-1">
               Contatos diretos de buffet, som, foto, vídeo e iluminação para acionamento imediato
               durante a festa.
             </p>
@@ -299,17 +310,17 @@ export default function Teams() {
 
           <Button
             onClick={() => setIsSupplierDialogOpen(true)}
-            className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-2 shadow-sm shrink-0"
+            className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold gap-2 shadow-elevation shrink-0 rounded-xl"
           >
             <Plus className="w-4 h-4" /> Novo Fornecedor
           </Button>
         </div>
 
         {suppliers.length === 0 ? (
-          <Card className="text-center py-12 bg-white border-dashed">
+          <Card className="text-center py-12 bg-[#161412] border-dashed border-[#2B2620] rounded-2xl">
             <CardContent>
-              <Truck className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
-              <p className="text-sm text-[#6B6356]">Nenhum fornecedor cadastrado.</p>
+              <Truck className="w-8 h-8 text-neutral-500 mx-auto mb-2" />
+              <p className="text-sm text-neutral-400">Nenhum fornecedor cadastrado.</p>
             </CardContent>
           </Card>
         ) : (
@@ -317,36 +328,38 @@ export default function Teams() {
             {suppliers.map((s) => (
               <Card
                 key={s.id}
-                className="bg-white border-neutral-200 shadow-sm hover:border-[#C5A45F] transition-all"
+                className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation hover:border-[#C5A45F] transition-all rounded-2xl"
               >
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold mb-1">
+                      <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#3D3528] text-[10px] font-bold mb-1">
                         {s.category}
                       </Badge>
-                      <h4 className="font-serif font-bold text-base text-[#1C1A17]">{s.name}</h4>
+                      <h4 className="font-serif font-bold text-base text-white">{s.name}</h4>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeleteSupplier(s.id, s.name)}
-                      className="h-7 w-7 text-neutral-400 hover:text-red-600"
+                      className="h-7 w-7 text-neutral-500 hover:text-red-400"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>
 
-                  <div className="text-xs text-[#6B6356] space-y-1 pt-1 border-t border-neutral-100">
+                  <div className="text-xs text-neutral-400 space-y-1 pt-2 border-t border-[#25201A]">
                     {s.contact && (
                       <div className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-neutral-500" />
-                        <span>Contato: {s.contact}</span>
+                        <span>
+                          Contato: <strong className="text-neutral-200">{s.contact}</strong>
+                        </span>
                       </div>
                     )}
                     {s.phone && (
-                      <div className="flex items-center gap-1.5 font-medium text-emerald-800">
-                        <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                      <div className="flex items-center gap-1.5 font-medium text-emerald-400">
+                        <Phone className="w-3.5 h-3.5 text-emerald-400" />
                         <a href={`tel:${s.phone}`} className="hover:underline">
                           {s.phone}
                         </a>
@@ -362,7 +375,7 @@ export default function Teams() {
 
       {/* Member Dialog */}
       <Dialog open={isMemberDialogOpen} onOpenChange={setIsMemberDialogOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-white">
+        <DialogContent className="sm:max-w-[420px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
           <form onSubmit={handleAddMember}>
             <DialogHeader>
               <DialogTitle className="font-serif text-xl">Adicionar Integrante</DialogTitle>
@@ -410,7 +423,7 @@ export default function Teams() {
               <Button
                 type="submit"
                 disabled={isSubmittingMember}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl"
               >
                 {isSubmittingMember ? 'Salvando...' : 'Salvar Integrante'}
               </Button>
@@ -421,7 +434,7 @@ export default function Teams() {
 
       {/* Supplier Dialog */}
       <Dialog open={isSupplierDialogOpen} onOpenChange={setIsSupplierDialogOpen}>
-        <DialogContent className="sm:max-w-[450px] bg-white">
+        <DialogContent className="sm:max-w-[450px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
           <form onSubmit={handleAddSupplier}>
             <DialogHeader>
               <DialogTitle className="font-serif text-xl">Novo Fornecedor</DialogTitle>
@@ -494,7 +507,7 @@ export default function Teams() {
               <Button
                 type="submit"
                 disabled={isSubmittingSupplier}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl"
               >
                 {isSubmittingSupplier ? 'Salvando...' : 'Salvar Fornecedor'}
               </Button>

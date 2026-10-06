@@ -185,10 +185,10 @@ export default function Occurrences() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <AlertTriangle className="w-4 h-4" /> Gestão de Incidentes
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white">
             Registro de Ocorrências ({occurrences.length})
           </h1>
-          <p className="text-sm text-[#6B6356] mt-1">
+          <p className="text-sm text-neutral-400 mt-1">
             Histórico cronológico de imprevistos, responsáveis acionados e soluções imediatas
             adotadas.
           </p>
@@ -196,22 +196,22 @@ export default function Occurrences() {
 
         <Button
           onClick={openCreateDialog}
-          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-2 shadow-sm shrink-0"
+          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold gap-2 shadow-elevation shrink-0 rounded-xl"
         >
           <Plus className="w-4 h-4" /> Adicionar Ocorrência
         </Button>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-neutral-200 flex items-center justify-between gap-3 text-xs">
+      <div className="bg-[#161412] p-3.5 rounded-2xl border border-[#2B2620] flex items-center justify-between gap-3 text-xs shadow-elevation">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-[#6B6356]" />
-          <span className="font-semibold text-[#6B6356]">Filtrar por Categoria:</span>
+          <Filter className="w-4 h-4 text-neutral-400" />
+          <span className="font-semibold text-neutral-300">Filtrar por Categoria:</span>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="h-9 w-44 text-xs bg-neutral-50">
+            <SelectTrigger className="h-9 w-44 text-xs bg-[#1C1915] border-[#332D24] text-white">
               <SelectValue placeholder="Todas as categorias" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
               <SelectItem value="ALL">Todas as Categorias</SelectItem>
               <SelectItem value="CONVIDADO">Convidado</SelectItem>
               <SelectItem value="MESA">Mesa</SelectItem>
@@ -229,7 +229,7 @@ export default function Occurrences() {
             variant="ghost"
             size="sm"
             onClick={() => setCategoryFilter('ALL')}
-            className="text-xs text-[#6B6356]"
+            className="text-xs text-neutral-400 hover:text-white"
           >
             Limpar Filtro
           </Button>
@@ -242,11 +242,11 @@ export default function Occurrences() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C5A45F] border-t-transparent" />
         </div>
       ) : filteredOccurrences.length === 0 ? (
-        <Card className="text-center py-16 bg-white border-dashed">
+        <Card className="text-center py-16 bg-[#161412] border-dashed border-[#2B2620] rounded-2xl">
           <CardContent>
-            <AlertTriangle className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-[#221E1A]">Nenhuma ocorrência registrada.</p>
-            <p className="text-xs text-[#6B6356] mt-1">
+            <AlertTriangle className="w-10 h-10 text-neutral-500 mx-auto mb-3" />
+            <p className="text-sm font-medium text-white">Nenhuma ocorrência registrada.</p>
+            <p className="text-xs text-neutral-400 mt-1">
               O evento está transcorrendo em perfeita harmonia.
             </p>
           </CardContent>
@@ -264,13 +264,13 @@ export default function Occurrences() {
             return (
               <Card
                 key={occ.id}
-                className="bg-white border-neutral-200 hover:border-[#C5A45F] transition-all shadow-sm"
+                className="bg-[#161412] text-white border border-[#2B2620] hover:border-[#C5A45F] transition-all shadow-elevation rounded-2xl"
               >
                 <CardContent className="p-5 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       {getCategoryBadge(occ.category)}
-                      <span className="flex items-center gap-1 text-xs text-[#6B6356]">
+                      <span className="flex items-center gap-1 text-xs text-neutral-400">
                         <Clock className="w-3.5 h-3.5 text-[#C5A45F]" />
                         {timeStr}
                       </span>
@@ -280,35 +280,33 @@ export default function Occurrences() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(occ.id)}
-                      className="h-7 w-7 text-neutral-400 hover:text-red-600"
+                      className="h-7 w-7 text-neutral-500 hover:text-red-400"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>
 
                   <div>
-                    <h3 className="font-serif font-bold text-base text-[#1C1A17]">
-                      {occ.description}
-                    </h3>
+                    <h3 className="font-serif font-bold text-base text-white">{occ.description}</h3>
                   </div>
 
                   {/* Solution Box */}
                   {occ.solution && (
-                    <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950 space-y-1">
-                      <div className="flex items-center gap-1.5 font-bold text-emerald-800 uppercase tracking-wider text-[10px]">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <div className="bg-[#121E16] border border-emerald-800/60 rounded-xl p-3 text-xs text-emerald-200 space-y-1">
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-400 uppercase tracking-wider text-[10px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         Solução Adotada:
                       </div>
-                      <p className="leading-relaxed pl-5">{occ.solution}</p>
+                      <p className="leading-relaxed pl-5 text-neutral-200">{occ.solution}</p>
                     </div>
                   )}
 
                   {/* Responsible footer */}
-                  <div className="pt-2 border-t border-neutral-100 text-xs text-[#6B6356] flex items-center justify-between">
+                  <div className="pt-2 border-t border-[#25201A] text-xs text-neutral-400 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-neutral-400" />
+                      <User className="w-3.5 h-3.5 text-neutral-500" />
                       Responsável pelo registro:{' '}
-                      <strong className="text-neutral-800">
+                      <strong className="text-neutral-200">
                         {occ.responsible || 'Cerimonial'}
                       </strong>
                     </span>
@@ -332,7 +330,7 @@ export default function Occurrences() {
 
       {/* Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white">
+        <DialogContent className="sm:max-w-[500px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle className="font-serif text-xl">Registrar Ocorrência</DialogTitle>

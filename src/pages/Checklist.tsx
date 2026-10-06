@@ -259,10 +259,10 @@ export default function Checklist() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <CheckSquare className="w-4 h-4" /> Pré-Abertura & Homologação Operacional
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-white tracking-tight">
             Checklist Pré-Abertura (~20 Itens por Setor)
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+          <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
             Validação rigorosa antes da liberação do salão às 19h. Bloqueios impedem a abertura do
             evento.
           </p>
@@ -272,10 +272,10 @@ export default function Checklist() {
         <div className="flex items-center gap-3">
           <Button
             onClick={handleMarkEventReady}
-            className={`font-serif font-bold text-sm h-12 px-6 rounded-xl shadow-lg transition-all ${
+            className={`font-serif font-bold text-sm h-12 px-6 rounded-xl shadow-elevation transition-all ${
               isEventReady
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                : 'bg-red-700 hover:bg-red-800 text-white'
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_rgba(16,185,129,0.35)]'
+                : 'bg-red-700 hover:bg-red-800 text-white shadow-[0_0_20px_rgba(220,38,38,0.35)]'
             }`}
           >
             {isEventReady ? (
@@ -293,11 +293,11 @@ export default function Checklist() {
 
       {/* MODO DE URGÊNCIA BANNER (Requirement D: Próximo da abertura com pendências críticas) */}
       {criticalPendingItems.length > 0 ? (
-        <div className="bg-red-950 text-red-100 p-5 rounded-2xl border-4 border-red-600 shadow-xl space-y-3 animate-fade-in">
+        <div className="bg-[#240C0C] text-red-100 p-5 rounded-2xl border-2 border-red-600/80 shadow-elevation space-y-3 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-red-800 flex items-center justify-center text-red-200 shrink-0 border border-red-600">
-                <ShieldAlert className="w-7 h-7 text-white animate-pulse" />
+              <div className="w-12 h-12 rounded-xl bg-red-950/80 flex items-center justify-center text-red-200 shrink-0 border border-red-700">
+                <ShieldAlert className="w-7 h-7 text-red-400 animate-pulse" />
               </div>
               <div>
                 <span className="text-xs font-mono font-bold tracking-widest text-red-400 uppercase">
@@ -312,7 +312,7 @@ export default function Checklist() {
 
             <Button
               onClick={() => setUrgencyFilter(true)}
-              className="bg-white text-red-950 hover:bg-red-50 font-bold text-xs h-9 shrink-0"
+              className="bg-red-700 text-white hover:bg-red-800 font-bold text-xs h-9 shrink-0 rounded-xl"
             >
               Focar Pendências Críticas
             </Button>
@@ -322,12 +322,13 @@ export default function Checklist() {
             {criticalPendingItems.slice(0, 4).map((cp) => (
               <div
                 key={cp.id}
-                className="bg-red-900/80 p-3 rounded-xl border border-red-700 flex items-center justify-between text-xs"
+                className="bg-[#311111] p-3 rounded-xl border border-red-800/80 flex items-center justify-between text-xs"
               >
                 <div>
                   <div className="font-bold text-white">{cp.description}</div>
                   <div className="text-[11px] text-red-300 mt-0.5">
-                    Responsável: <strong>{cp.responsible}</strong> • {cp.supplier_sector}
+                    Responsável: <strong className="text-white">{cp.responsible}</strong> •{' '}
+                    {cp.supplier_sector}
                   </div>
                 </div>
 
@@ -340,7 +341,7 @@ export default function Checklist() {
                         `URGÊNCIA CELEBRA: Abertura iminente! O item "${cp.description}" sob sua responsabilidade (${cp.responsible}) está PENDENTE. Por favor, confirme o status imediatamente.`,
                       )
                     }}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] h-7 px-2 font-semibold gap-1"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] h-7 px-2 font-semibold gap-1 rounded-lg"
                   >
                     <Send className="w-3 h-3" /> Cobrar WhatsApp
                   </Button>
@@ -351,7 +352,7 @@ export default function Checklist() {
                       setBypassItem(cp)
                       setIsBypassDialogOpen(true)
                     }}
-                    className="bg-white/10 hover:bg-white/20 text-white border-white/20 text-[11px] h-7 px-2"
+                    className="bg-[#210D0D] hover:bg-[#381616] text-red-300 border-red-800 text-[11px] h-7 px-2 rounded-lg"
                   >
                     Escalonar
                   </Button>
@@ -361,7 +362,7 @@ export default function Checklist() {
           </div>
         </div>
       ) : (
-        <div className="bg-emerald-950 text-emerald-100 p-4 rounded-xl border-2 border-emerald-700 flex items-center justify-between">
+        <div className="bg-[#0E2015] text-emerald-100 p-4 rounded-2xl border border-emerald-600/60 flex items-center justify-between shadow-elevation">
           <div className="flex items-center gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-400" />
             <div>
@@ -374,42 +375,44 @@ export default function Checklist() {
               </span>
             </div>
           </div>
-          <Badge className="bg-emerald-700 text-white">100% PRONTO</Badge>
+          <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            100% PRONTO
+          </Badge>
         </div>
       )}
 
       {/* Filter and Overview Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="bg-white p-3.5 border border-neutral-200">
-          <span className="text-[10px] uppercase font-bold text-[#6B6356]">Total de Itens</span>
-          <div className="text-2xl font-serif font-bold text-[#1C1A17] mt-0.5">{totalItems}</div>
+        <Card className="bg-[#161412] p-3.5 border border-[#2B2620] rounded-2xl shadow-elevation">
+          <span className="text-[10px] uppercase font-bold text-neutral-400">Total de Itens</span>
+          <div className="text-2xl font-serif font-bold text-white mt-0.5">{totalItems}</div>
           <span className="text-[11px] text-neutral-500">16 setores auditados</span>
         </Card>
-        <Card className="bg-white p-3.5 border border-neutral-200">
-          <span className="text-[10px] uppercase font-bold text-emerald-700">Concluídos</span>
-          <div className="text-2xl font-serif font-bold text-emerald-700 mt-0.5">
+        <Card className="bg-[#161412] p-3.5 border border-[#2B2620] rounded-2xl shadow-elevation">
+          <span className="text-[10px] uppercase font-bold text-emerald-400">Concluídos</span>
+          <div className="text-2xl font-serif font-bold text-emerald-400 mt-0.5">
             {completedItems}
           </div>
-          <span className="text-[11px] text-emerald-600">
+          <span className="text-[11px] text-emerald-500/80">
             {totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0}% concluído
           </span>
         </Card>
-        <Card className="bg-white p-3.5 border border-neutral-200">
-          <span className="text-[10px] uppercase font-bold text-red-700">Pendências Críticas</span>
-          <div className="text-2xl font-serif font-bold text-red-700 mt-0.5">
+        <Card className="bg-[#161412] p-3.5 border border-[#2B2620] rounded-2xl shadow-elevation">
+          <span className="text-[10px] uppercase font-bold text-red-400">Pendências Críticas</span>
+          <div className="text-2xl font-serif font-bold text-red-400 mt-0.5">
             {criticalPendingItems.length}
           </div>
-          <span className="text-[11px] text-red-600">Bloqueiam abertura</span>
+          <span className="text-[11px] text-red-400/80">Bloqueiam abertura</span>
         </Card>
-        <Card className="bg-white p-3.5 border border-neutral-200">
-          <span className="text-[10px] uppercase font-bold text-[#6B6356]">Status Geral</span>
-          <div className="text-sm font-serif font-bold text-[#1C1A17] mt-1.5 flex items-center gap-1.5">
+        <Card className="bg-[#161412] p-3.5 border border-[#2B2620] rounded-2xl shadow-elevation">
+          <span className="text-[10px] uppercase font-bold text-neutral-400">Status Geral</span>
+          <div className="text-sm font-serif font-bold text-white mt-1.5 flex items-center gap-1.5">
             {isEventReady ? (
-              <span className="text-emerald-700 flex items-center gap-1">
+              <span className="text-emerald-400 flex items-center gap-1">
                 <CheckCircle2 className="w-4 h-4" /> Homologado
               </span>
             ) : (
-              <span className="text-red-700 flex items-center gap-1">
+              <span className="text-red-400 flex items-center gap-1">
                 <AlertTriangle className="w-4 h-4" /> Bloqueado
               </span>
             )}
@@ -419,20 +422,20 @@ export default function Checklist() {
       </div>
 
       {/* Filter by Area */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-neutral-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#161412] p-3.5 rounded-2xl border border-[#2B2620] shadow-elevation">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-[#6B6356]" />
-          <span className="text-xs font-semibold text-[#1C1A17]">
+          <Filter className="w-4 h-4 text-neutral-400" />
+          <span className="text-xs font-semibold text-neutral-200">
             Filtrar por Área Operacional:
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           <Select value={selectedArea} onValueChange={setSelectedArea}>
-            <SelectTrigger className="w-full sm:w-[260px] h-9 text-xs bg-white">
+            <SelectTrigger className="w-full sm:w-[260px] h-9 text-xs bg-[#1C1915] border-[#332D24] text-white">
               <SelectValue placeholder="Todas as áreas" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
               <SelectItem value="ALL">Todas as 16 Áreas</SelectItem>
               {Object.entries(AREA_LABELS).map(([k, label]) => (
                 <SelectItem key={k} value={k}>
@@ -447,7 +450,7 @@ export default function Checklist() {
               variant="outline"
               size="sm"
               onClick={() => setUrgencyFilter(false)}
-              className="text-xs h-9 border-red-300 text-red-800"
+              className="text-xs h-9 border-red-800/80 text-red-300 bg-[#261515] hover:bg-[#331C1C]"
             >
               Limpar Filtro de Urgência
             </Button>
@@ -466,44 +469,42 @@ export default function Checklist() {
           return (
             <Card
               key={item.id}
-              className={`border-2 transition-all shadow-sm ${
+              className={`border transition-all shadow-elevation rounded-2xl ${
                 isCriticalPending
-                  ? 'border-red-600 bg-red-50/20'
+                  ? 'border-red-600/80 bg-[#1D1212]'
                   : item.status === 'CONCLUIDO'
-                    ? 'border-neutral-200 bg-white'
-                    : 'border-amber-300 bg-white'
+                    ? 'border-[#2B2620] bg-[#161412]'
+                    : 'border-amber-600/40 bg-[#1A1612]'
               }`}
             >
               <CardContent className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1.5 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold">
+                    <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#3D3425] text-[10px] font-bold">
                       {AREA_LABELS[item.area] || item.area}
                     </Badge>
                     <Badge className={`text-[10px] ${st.class}`}>{st.label}</Badge>
                     {item.is_critical && (
-                      <Badge className="bg-red-700 text-white text-[10px] font-bold">
+                      <Badge className="bg-red-900/60 text-red-300 border border-red-700/80 text-[10px] font-bold">
                         ★ CRÍTICO
                       </Badge>
                     )}
                     {isBypassed && (
-                      <Badge className="bg-neutral-800 text-amber-300 text-[10px]">
+                      <Badge className="bg-[#2B2418] text-amber-300 border border-amber-600/50 text-[10px]">
                         LIBERADO POR COORDENAÇÃO
                       </Badge>
                     )}
                   </div>
 
-                  <h3 className="font-serif font-bold text-base text-[#1C1A17]">
-                    {item.description}
-                  </h3>
+                  <h3 className="font-serif font-bold text-base text-white">{item.description}</h3>
 
-                  <div className="text-xs text-[#6B6356] flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <div className="text-xs text-neutral-400 flex flex-wrap items-center gap-x-4 gap-y-1">
                     <span>
-                      Responsável: <strong className="text-[#1C1A17]">{item.responsible}</strong>
+                      Responsável: <strong className="text-neutral-200">{item.responsible}</strong>
                     </span>
                     {item.supplier_sector && <span>Setor: {item.supplier_sector}</span>}
                     {item.confirmed_at && (
-                      <span className="text-emerald-700">
+                      <span className="text-emerald-400">
                         Confirmado às {new Date(item.confirmed_at).toLocaleTimeString('pt-BR')}
                       </span>
                     )}
@@ -511,15 +512,17 @@ export default function Checklist() {
 
                   {/* Evidências / Notas */}
                   {item.evidence_notes && (
-                    <div className="text-xs text-neutral-700 bg-neutral-50 p-2 rounded border border-neutral-200 mt-1">
-                      <strong>Evidência:</strong> {item.evidence_notes}
+                    <div className="text-xs text-neutral-300 bg-[#1D1915] p-2.5 rounded-xl border border-[#2B2620] mt-1">
+                      <strong className="text-white">Evidência:</strong> {item.evidence_notes}
                     </div>
                   )}
 
                   {/* Justificativa de bypass */}
                   {isBypassed && (
-                    <div className="text-xs text-amber-900 bg-amber-50 p-2 rounded border border-amber-200 mt-1">
-                      <strong>Autorizado por {item.bypass_authorized_by}:</strong>{' '}
+                    <div className="text-xs text-amber-200 bg-[#261E14] p-2.5 rounded-xl border border-amber-600/40 mt-1">
+                      <strong className="text-amber-300">
+                        Autorizado por {item.bypass_authorized_by}:
+                      </strong>{' '}
                       {item.bypass_justification}
                     </div>
                   )}
@@ -538,9 +541,9 @@ export default function Checklist() {
                           `CELEBRA: Olá ${item.responsible}, cobrança de status da tarefa "${item.description}". Favor confirmar recebimento e conclusão.`,
                         )
                       }}
-                      className="text-xs h-9 border-neutral-300 text-emerald-800 hover:bg-emerald-50 gap-1.5"
+                      className="text-xs h-9 border-[#332D24] text-emerald-400 bg-[#16211A] hover:bg-[#1E2D23] gap-1.5 rounded-xl"
                     >
-                      <Send className="w-3.5 h-3.5 text-emerald-600" /> Cobrar via WhatsApp
+                      <Send className="w-3.5 h-3.5 text-emerald-400" /> Cobrar via WhatsApp
                     </Button>
                   )}
 
@@ -553,7 +556,7 @@ export default function Checklist() {
                         setBypassItem(item)
                         setIsBypassDialogOpen(true)
                       }}
-                      className="text-xs h-9 border-red-300 text-red-800 hover:bg-red-50 gap-1"
+                      className="text-xs h-9 border-red-800/80 text-red-300 bg-[#261515] hover:bg-[#331C1C] gap-1 rounded-xl"
                     >
                       <ArrowUpRight className="w-3.5 h-3.5" /> Escalonar
                     </Button>
@@ -570,7 +573,7 @@ export default function Checklist() {
                       setEditReceived(item.received_confirmed ?? true)
                       setEditUnderstood(item.understood_confirmed ?? true)
                     }}
-                    className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold text-xs h-9 px-4"
+                    className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold text-xs h-9 px-4 rounded-xl shadow-md"
                   >
                     Validar / Atualizar
                   </Button>
@@ -584,38 +587,43 @@ export default function Checklist() {
       {/* EDIT / VALIDATE ITEM MODAL */}
       {editingItem && (
         <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
-          <DialogContent className="sm:max-w-[550px] bg-white">
+          <DialogContent className="sm:max-w-[550px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
             <DialogHeader>
               <div className="flex items-center gap-2">
-                <Badge className="bg-[#1C1A17] text-[#C5A45F]">
+                <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#3D3425]">
                   {AREA_LABELS[editingItem.area]}
                 </Badge>
                 {editingItem.is_critical && (
-                  <Badge className="bg-red-700 text-white">ITEM CRÍTICO</Badge>
+                  <Badge className="bg-red-900/60 text-red-300 border border-red-700/80">
+                    ITEM CRÍTICO
+                  </Badge>
                 )}
               </div>
-              <DialogTitle className="font-serif text-xl text-[#1C1A17]">
+              <DialogTitle className="font-serif text-xl text-white">
                 {editingItem.description}
               </DialogTitle>
-              <DialogDescription>
-                Responsável: <strong>{editingItem.responsible}</strong> • Setor:{' '}
-                {editingItem.supplier_sector}
+              <DialogDescription className="text-neutral-400 text-xs">
+                Responsável: <strong className="text-white">{editingItem.responsible}</strong> •
+                Setor: {editingItem.supplier_sector}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-2 text-xs">
               <div className="space-y-1">
-                <Label htmlFor="chk-status" className="font-bold text-neutral-800">
+                <Label htmlFor="chk-status" className="font-bold text-neutral-300">
                   Status da Tarefa:
                 </Label>
                 <Select
                   value={editStatus}
                   onValueChange={(v) => setEditStatus(v as ChecklistStatus)}
                 >
-                  <SelectTrigger id="chk-status" className="h-10 bg-white">
+                  <SelectTrigger
+                    id="chk-status"
+                    className="h-10 bg-[#1C1915] border-[#332D24] text-white"
+                  >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                     <SelectItem value="NAO_INICIADO">Não Iniciado</SelectItem>
                     <SelectItem value="EM_ANDAMENTO">Em Andamento</SelectItem>
                     <SelectItem value="AGUARDANDO_TERCEIRO">
@@ -629,29 +637,29 @@ export default function Checklist() {
               </div>
 
               {/* Requirement D: confirmação de recebimento, confirmação de entendimento */}
-              <div className="grid grid-cols-2 gap-3 p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-[#1C1915] rounded-xl border border-[#2B2620]">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={editReceived}
                     onChange={(e) => setEditReceived(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#C5A45F] focus:ring-[#C5A45F]"
+                    className="w-4 h-4 rounded text-[#C5A45F] focus:ring-[#C5A45F] bg-[#12100E] border-[#383125]"
                   />
-                  <span className="font-semibold text-neutral-800">Recebimento Confirmado</span>
+                  <span className="font-semibold text-neutral-200">Recebimento Confirmado</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={editUnderstood}
                     onChange={(e) => setEditUnderstood(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#C5A45F] focus:ring-[#C5A45F]"
+                    className="w-4 h-4 rounded text-[#C5A45F] focus:ring-[#C5A45F] bg-[#12100E] border-[#383125]"
                   />
-                  <span className="font-semibold text-neutral-800">Entendimento Confirmado</span>
+                  <span className="font-semibold text-neutral-200">Entendimento Confirmado</span>
                 </label>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="chk-evidence" className="text-neutral-800 font-bold">
+                <Label htmlFor="chk-evidence" className="text-neutral-300 font-bold">
                   Evidência / Observações de Campo:
                 </Label>
                 <Input
@@ -659,35 +667,39 @@ export default function Checklist() {
                   placeholder="Ex: Todas as 10 mesas conferidas; cabos fixados com fita gaffer..."
                   value={editEvidenceNotes}
                   onChange={(e) => setEditEvidenceNotes(e.target.value)}
-                  className="h-10"
+                  className="h-10 bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
               <div className="space-y-1">
                 <Label
                   htmlFor="chk-photo"
-                  className="text-neutral-800 font-bold flex items-center gap-1"
+                  className="text-neutral-300 font-bold flex items-center gap-1"
                 >
-                  <Camera className="w-3.5 h-3.5" /> Foto da Evidência (Opcional):
+                  <Camera className="w-3.5 h-3.5 text-[#C5A45F]" /> Foto da Evidência (Opcional):
                 </Label>
                 <Input
                   id="chk-photo"
                   placeholder="URL ou arquivo da foto comprobatória..."
                   value={editEvidencePhoto}
                   onChange={(e) => setEditEvidencePhoto(e.target.value)}
-                  className="h-9"
+                  className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditingItem(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setEditingItem(null)}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#24201A]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSaveItem}
                 disabled={isUpdating}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold"
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl"
               >
                 {isUpdating ? 'Salvando...' : 'Salvar e Registrar Horário'}
               </Button>
@@ -702,43 +714,50 @@ export default function Checklist() {
           open={!!whatsAppPromptItem}
           onOpenChange={(open) => !open && setWhatsAppPromptItem(null)}
         >
-          <DialogContent className="sm:max-w-[480px] bg-white border-2 border-emerald-500">
+          <DialogContent className="sm:max-w-[480px] bg-[#141E17] text-white border border-emerald-500/60 rounded-2xl shadow-2xl">
             <DialogHeader>
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-2">
+              <div className="w-12 h-12 rounded-xl bg-emerald-950/80 text-emerald-400 border border-emerald-700/80 flex items-center justify-center mx-auto mb-2">
                 <Send className="w-6 h-6" />
               </div>
-              <DialogTitle className="font-serif text-xl text-center text-emerald-950">
+              <DialogTitle className="font-serif text-xl text-center text-emerald-300">
                 Disparo de Cobrança via WhatsApp
               </DialogTitle>
-              <DialogDescription className="text-center text-xs">
-                Destinatário: <strong>{whatsAppPromptItem.responsible}</strong> (
+              <DialogDescription className="text-center text-xs text-neutral-400">
+                Destinatário:{' '}
+                <strong className="text-white">{whatsAppPromptItem.responsible}</strong> (
                 {whatsAppPromptItem.supplier_sector})
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 py-2 text-xs">
-              <Label htmlFor="wp-msg">Texto da Notificação:</Label>
+              <Label htmlFor="wp-msg" className="text-neutral-300">
+                Texto da Notificação:
+              </Label>
               <textarea
                 id="wp-msg"
                 rows={3}
                 value={whatsAppMsgCustom}
                 onChange={(e) => setWhatsAppMsgCustom(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 p-2.5 text-xs focus:ring-2 focus:ring-[#C5A45F]"
+                className="w-full rounded-xl border border-emerald-800/80 bg-[#1B291F] p-2.5 text-xs text-white focus:ring-2 focus:ring-[#C5A45F]"
               />
-              <p className="text-[11px] text-[#6B6356]">
+              <p className="text-[11px] text-neutral-400">
                 A mensagem será registrada na central de mensagens WhatsApp e no log de auditoria
                 operacional.
               </p>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setWhatsAppPromptItem(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setWhatsAppPromptItem(null)}
+                className="border-[#2B3B30] text-neutral-300 hover:bg-[#203126]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSendUrgencyWhatsApp}
                 disabled={isSendingWhatsApp}
-                className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
               >
                 {isSendingWhatsApp ? 'Enviando...' : 'Despachar Notificação'}
               </Button>
@@ -749,26 +768,26 @@ export default function Checklist() {
 
       {/* ESCALATE / BYPASS DIALOG (Requirement D: Bloqueio só ignorável com justificativa e autorização) */}
       <Dialog open={isBypassDialogOpen} onOpenChange={setIsBypassDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white border-2 border-red-600">
+        <DialogContent className="sm:max-w-[500px] bg-[#1A1111] text-white border border-red-700/80 rounded-2xl shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="font-serif text-xl text-red-950 flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-red-600" /> Escalonamento de Bloqueio Crítico
+            <DialogTitle className="font-serif text-xl text-red-300 flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-red-400" /> Escalonamento de Bloqueio Crítico
             </DialogTitle>
-            <DialogDescription className="text-xs">
-              Item: <strong>{bypassItem?.description}</strong>
+            <DialogDescription className="text-xs text-neutral-400">
+              Item: <strong className="text-white">{bypassItem?.description}</strong>
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 py-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="by-auth" className="font-bold text-red-950">
+              <Label htmlFor="by-auth" className="font-bold text-red-300">
                 Líder da Coordenação que Autoriza a Liberação:
               </Label>
               <Select value={bypassAuthorizer} onValueChange={setBypassAuthorizer}>
-                <SelectTrigger id="by-auth" className="bg-white border-red-300">
+                <SelectTrigger id="by-auth" className="bg-[#1C1212] border-red-800 text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-[#1C1212] border-red-800 text-white">
                   <SelectItem value="Hugo Cerimonial">
                     Hugo Cerimonial (Cerimonialista Chefe)
                   </SelectItem>
@@ -782,7 +801,7 @@ export default function Checklist() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="by-just" className="font-bold text-red-950">
+              <Label htmlFor="by-just" className="font-bold text-red-300">
                 Justificativa Formal Obrigatória:
               </Label>
               <Input
@@ -790,19 +809,23 @@ export default function Checklist() {
                 placeholder="Ex: Fornecedor realizou ajuste emergencial in loco; contingência ativada..."
                 value={bypassJustification}
                 onChange={(e) => setBypassJustification(e.target.value)}
-                className="h-11"
+                className="h-11 bg-[#1C1212] border-red-800 text-white"
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBypassDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsBypassDialogOpen(false)}
+              className="border-[#382626] text-neutral-300 hover:bg-[#2B1B1B]"
+            >
               Cancelar
             </Button>
             <Button
               onClick={handleBypassBlock}
               disabled={!bypassJustification.trim()}
-              className="bg-red-700 hover:bg-red-800 text-white font-bold"
+              className="bg-red-700 hover:bg-red-800 text-white font-bold rounded-xl"
             >
               Autorizar e Liberar Abertura
             </Button>

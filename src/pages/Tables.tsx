@@ -335,10 +335,10 @@ export default function Tables() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <Users className="w-4 h-4" /> Layout do Salão & Gestão Rígida de Cadeiras
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white">
             Mapa Visual das Mesas (~20 Mesas)
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+          <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
             Capacidades variáveis (8, 9 e 10 lugares), trava cerimonial, conferência física por foto
             e controle estrito de transferências.
           </p>
@@ -349,7 +349,6 @@ export default function Tables() {
           <Button
             onClick={() => {
               if (tables.length >= 2) {
-                // Preselect Mesa 03 (8 lugares) to Mesa 05 for scenario demonstration
                 const m3 = tables.find((t) => t.name.includes('03'))
                 const m5 = tables.find((t) => t.name.includes('05'))
                 if (m3) setChairSourceId(m3.id)
@@ -357,7 +356,7 @@ export default function Tables() {
               }
               setIsChairModalOpen(true)
             }}
-            className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] border border-[#3D3833] font-bold text-xs h-10 gap-1.5 shadow"
+            className="bg-[#1C1915] hover:bg-[#28231D] text-[#C5A45F] border border-[#3D3425] font-bold text-xs h-10 gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(197,164,95,0.25)] rounded-xl"
           >
             <ArrowRightLeft className="w-4 h-4 text-[#C5A45F]" />
             Solicitar Transferência de Cadeiras
@@ -366,13 +365,13 @@ export default function Tables() {
       </div>
 
       {/* Mandatory Fixed Warning Banner (Requirement C.9) */}
-      <div className="bg-red-950 text-red-100 p-4 rounded-xl border-2 border-red-800 shadow-md flex items-center justify-between gap-4">
+      <div className="bg-[#240C0C] text-red-200 p-4 rounded-2xl border border-red-800/80 shadow-elevation flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-red-900 border border-red-700 flex items-center justify-center text-red-200 shrink-0">
-            <Lock className="w-5 h-5 text-red-300" />
+          <div className="w-10 h-10 rounded-xl bg-red-950/80 border border-red-700/60 flex items-center justify-center text-red-300 shrink-0">
+            <Lock className="w-5 h-5 text-red-400" />
           </div>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-red-300 block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 block">
               REGRA DE OURO OPERACIONAL — PROTOCOLO HUGO & RENATO
             </span>
             <strong className="text-xs sm:text-sm text-white font-serif tracking-wide block">
@@ -380,21 +379,21 @@ export default function Tables() {
             </strong>
           </div>
         </div>
-        <Badge className="bg-red-800 text-white border-red-600 text-[10px] shrink-0 font-mono hidden sm:inline-flex">
+        <Badge className="bg-red-900/60 text-red-200 border-red-700/80 text-[10px] shrink-0 font-mono hidden sm:inline-flex">
           MAPA TRAVADO
         </Badge>
       </div>
 
       {/* Painel de Divergências antes da abertura (Requirement C.12) */}
       {tablesWithDivergence.length > 0 && (
-        <Card className="border-2 border-red-500 bg-red-50/60 shadow-md">
+        <Card className="border border-red-700/60 bg-[#1F1111] shadow-elevation rounded-2xl">
           <CardHeader className="p-4 pb-2">
-            <CardTitle className="text-sm font-serif font-bold text-red-950 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-600 animate-pulse" />
+            <CardTitle className="text-sm font-serif font-bold text-red-300 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-400 animate-pulse" />
               Painel de Divergências de Montagem ({tablesWithDivergence.length} mesa com divergência
               física)
             </CardTitle>
-            <CardDescription className="text-xs text-red-800">
+            <CardDescription className="text-xs text-red-400/80">
               Atenção antes da abertura do salão: a quantidade de cadeiras montadas difere do
               planejamento homologado.
             </CardDescription>
@@ -411,23 +410,22 @@ export default function Tables() {
                       setPhysicalChairsInput(physical)
                       setConferencePhotoInput(divTable.conference_photo || '')
                     }}
-                    className="p-3 bg-white rounded-xl border border-red-300 cursor-pointer hover:shadow transition-all flex items-center justify-between"
+                    className="p-3 bg-[#2A1515] rounded-xl border border-red-800/80 cursor-pointer hover:border-red-500 transition-all flex items-center justify-between"
                   >
                     <div>
-                      <div className="font-serif font-bold text-sm text-[#1C1A17]">
-                        {divTable.name}
+                      <div className="font-serif font-bold text-sm text-white">{divTable.name}</div>
+                      <div className="text-xs text-red-300 font-semibold mt-0.5">
+                        Físico: <strong className="text-white">{physical}</strong> / Planejado:{' '}
+                        <strong>{planned}</strong>
                       </div>
-                      <div className="text-xs text-red-700 font-semibold mt-0.5">
-                        Físico: <strong>{physical}</strong> / Planejado: <strong>{planned}</strong>
-                      </div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">
+                      <div className="text-[10px] text-neutral-400 mt-0.5">
                         Resp: {divTable.conference_responsible || 'Renato'}
                       </div>
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-xs h-7 border-red-300 text-red-800"
+                      className="text-xs h-7 border-red-700/70 text-red-300 bg-[#351A1A] hover:bg-[#452020]"
                     >
                       Conferir
                     </Button>
@@ -440,12 +438,12 @@ export default function Tables() {
       )}
 
       {/* Legend & Orientation Map Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-neutral-200 text-xs text-[#6B6356] shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#161412] p-3.5 rounded-2xl border border-[#2B2620] text-xs text-neutral-400 shadow-elevation">
         {/* Você Está Aqui Indicator */}
-        <div className="flex items-center gap-2 font-bold text-[#1C1A17]">
-          <span className="w-3 h-3 rounded-full bg-blue-600 animate-ping inline-block" />
-          <MapPin className="w-4 h-4 text-blue-700" />
-          <span className="text-blue-950 font-serif">
+        <div className="flex items-center gap-2 font-bold text-white">
+          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping inline-block" />
+          <MapPin className="w-4 h-4 text-cyan-400" />
+          <span className="text-cyan-200 font-serif">
             Você está aqui: Foyer / Entrada Principal
           </span>
         </div>
@@ -453,23 +451,24 @@ export default function Tables() {
         {/* Status Colors Legend */}
         <div className="flex flex-wrap items-center gap-3 text-[11px]">
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> Disponível
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" /> Disponível
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1C1A17] inline-block" /> Completa
+            <span className="w-2.5 h-2.5 rounded-full bg-neutral-600 inline-block" /> Completa
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" /> Divergência /
+            <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" /> Divergência /
             Excedida
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Aguardando Conf.
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" /> Aguardando Conf.
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block" /> Liberada Buffet
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 inline-block" /> Liberada Buffet
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-neutral-800 inline-block" /> Bloqueada
+            <span className="w-2.5 h-2.5 rounded-full bg-[#141210] border border-neutral-600 inline-block" />{' '}
+            Bloqueada
           </span>
         </div>
       </div>
@@ -497,7 +496,7 @@ export default function Tables() {
                   setPhysicalChairsInput(physical)
                   setConferencePhotoInput(table.conference_photo || '')
                 }}
-                className={`group relative rounded-2xl p-5 cursor-pointer transition-all duration-200 border-2 bg-white shadow-sm hover:shadow-md hover:-translate-y-1 ${colorCfg.cardBorder}`}
+                className={`group relative rounded-2xl p-5 cursor-pointer transition-all duration-200 border bg-[#161412] shadow-elevation hover:border-[#C5A45F]/70 hover:-translate-y-1 ${colorCfg.cardBorder}`}
               >
                 {/* Header: Table circular number + capacity badge */}
                 <div className="flex items-start justify-between mb-3">
@@ -511,13 +510,13 @@ export default function Tables() {
                       <span>{table.name.replace(/[^0-9]/g, '') || '•'}</span>
                     </div>
                     <div>
-                      <h4 className="font-serif font-bold text-base text-[#1C1A17] flex items-center gap-1.5">
+                      <h4 className="font-serif font-bold text-base text-white flex items-center gap-1.5">
                         {table.name}
                         {table.is_locked && <Lock className="w-3 h-3 text-neutral-400" />}
                       </h4>
-                      <span className="text-xs font-semibold text-[#6B6356]">
+                      <span className="text-xs font-semibold text-neutral-400">
                         {assigned} ocupados /{' '}
-                        <strong className="text-[#1C1A17]">{capacity} lugares</strong>
+                        <strong className="text-white">{capacity} lugares</strong>
                       </span>
                     </div>
                   </div>
@@ -528,31 +527,32 @@ export default function Tables() {
                 </div>
 
                 {/* Chair conference mini breakdown */}
-                <div className="bg-neutral-50 p-2 rounded-lg text-[11px] flex items-center justify-between border border-neutral-200">
-                  <span>
-                    Cadeiras: <strong>{physical}</strong> físicas / <strong>{planned}</strong> plan.
+                <div className="bg-[#1F1C18] p-2 rounded-xl text-[11px] flex items-center justify-between border border-[#2B2620]">
+                  <span className="text-neutral-300">
+                    Cadeiras: <strong className="text-white">{physical}</strong> físicas /{' '}
+                    <strong className="text-neutral-400">{planned}</strong> plan.
                   </span>
                   {physical !== planned ? (
-                    <span className="text-red-700 font-bold flex items-center gap-0.5">
+                    <span className="text-red-400 font-bold flex items-center gap-0.5">
                       <AlertTriangle className="w-3 h-3" /> Divergente
                     </span>
                   ) : (
-                    <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
+                    <span className="text-emerald-400 font-semibold flex items-center gap-0.5">
                       <Check className="w-3 h-3" /> Conferida
                     </span>
                   )}
                 </div>
 
-                {/* Special Needs Indicator (SEM expor detalhes médicos a usuários sem permissão) */}
+                {/* Special Needs Indicator */}
                 {table.special_needs_note && (
-                  <div className="mt-2 text-[10px] text-blue-900 bg-blue-50/80 p-1.5 rounded border border-blue-200 font-medium truncate">
+                  <div className="mt-2 text-[10px] text-sky-300 bg-sky-950/40 p-1.5 rounded-lg border border-sky-800/60 font-medium truncate">
                     ★ Acomodação Especial Ativa
                   </div>
                 )}
 
                 {/* Associated Honorees Chips */}
-                <div className="mt-3 pt-2 border-t border-neutral-100 min-h-[38px]">
-                  <div className="text-[10px] uppercase tracking-wider text-[#6B6356] font-semibold mb-1">
+                <div className="mt-3 pt-2 border-t border-[#25201A] min-h-[38px]">
+                  <div className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
                     Homenageados:
                   </div>
                   {tableHonorees.length > 0 ? (
@@ -560,14 +560,14 @@ export default function Tables() {
                       {tableHonorees.map((h) => (
                         <span
                           key={h.id}
-                          className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                          className="bg-[#24201B] text-[#C5A45F] border border-[#383125] text-[10px] font-semibold px-2 py-0.5 rounded-full"
                         >
                           {h.name}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <span className="text-xs text-neutral-400 italic">Convidados gerais</span>
+                    <span className="text-xs text-neutral-500 italic">Convidados gerais</span>
                   )}
                 </div>
 
@@ -582,15 +582,15 @@ export default function Tables() {
         </div>
       </div>
 
-      {/* Contingency Tables Section (Requirement C.13: cadeiras + mesa de contingência sem desmontar as oficiais) */}
-      <div className="space-y-3 pt-4 border-t border-neutral-200">
+      {/* Contingency Tables Section */}
+      <div className="space-y-3 pt-4 border-t border-[#26221C]">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-serif font-bold text-lg text-[#1C1A17] flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-amber-700" />
+            <h3 className="font-serif font-bold text-lg text-white flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-amber-400" />
               Mesas de Contingência & Reserva Oficial
             </h3>
-            <p className="text-xs text-[#6B6356]">
+            <p className="text-xs text-neutral-400">
               Destinadas a imprevistos, autoridades e convidados de última hora sem desorganizar as
               20 mesas dos homenageados.
             </p>
@@ -609,24 +609,24 @@ export default function Tables() {
                   setPhysicalChairsInput(physical)
                   setConferencePhotoInput(rTable.conference_photo || '')
                 }}
-                className="bg-amber-50/40 border-2 border-amber-300 p-4 rounded-2xl cursor-pointer hover:shadow-md transition-all"
+                className="bg-[#1C1812] border border-amber-600/40 p-4 rounded-2xl cursor-pointer hover:border-amber-400 shadow-elevation transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-amber-900 tracking-wider">
+                    <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
                       CONTINGÊNCIA ATIVA
                     </span>
-                    <h4 className="font-serif font-bold text-base text-[#1C1A17] mt-0.5">
+                    <h4 className="font-serif font-bold text-base text-white mt-0.5">
                       {rTable.name} ({capacity} lugares)
                     </h4>
-                    <p className="text-xs text-[#6B6356] mt-0.5">
+                    <p className="text-xs text-neutral-400 mt-0.5">
                       {assigned} ocupados •{' '}
-                      <strong className="text-amber-900">{free} disponíveis</strong>
+                      <strong className="text-amber-300">{free} disponíveis</strong>
                     </p>
                   </div>
                   <Button
                     size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs"
+                    className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold text-xs rounded-xl"
                   >
                     Gerenciar
                   </Button>
@@ -640,27 +640,27 @@ export default function Tables() {
       {/* TABLE DETAIL & CONFERENCE MODAL (Requirement C.5, C.6, C.7, C.8) */}
       {selectedTable && (
         <Dialog open={!!selectedTable} onOpenChange={(open) => !open && setSelectedTable(null)}>
-          <DialogContent className="sm:max-w-[650px] bg-white max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[650px] bg-[#161412] text-white border border-[#332D24] max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl">
             <DialogHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-[#1C1A17] text-[#C5A45F] font-bold">
+                  <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#3D3425] font-bold">
                     {selectedTable.is_reserve ? 'CONTINGÊNCIA' : 'MESA REGULAR'}
                   </Badge>
-                  <span className="text-xs text-[#6B6356]">
+                  <span className="text-xs text-neutral-400">
                     Capacidade: {selectedTable.capacity} lugares
                   </span>
                 </div>
                 {selectedTable.is_locked && (
-                  <span className="text-xs text-neutral-500 flex items-center gap-1 font-semibold">
-                    <Lock className="w-3.5 h-3.5 text-neutral-500" /> Trava Cerimonial Ativa
+                  <span className="text-xs text-amber-400 flex items-center gap-1 font-semibold">
+                    <Lock className="w-3.5 h-3.5" /> Trava Cerimonial Ativa
                   </span>
                 )}
               </div>
-              <DialogTitle className="text-2xl font-serif font-bold text-[#1C1A17]">
+              <DialogTitle className="text-2xl font-serif font-bold text-white">
                 {selectedTable.name}
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-neutral-400 text-xs">
                 Checklist de conferência da montagem física, registro fotográfico e convidados
                 vinculados.
               </DialogDescription>
@@ -668,9 +668,9 @@ export default function Tables() {
 
             <div className="space-y-5 py-2 text-xs">
               {/* Mandatory Checklist / Conference Box */}
-              <div className="bg-[#F8F7F4] p-4 rounded-xl border border-neutral-300 space-y-3">
+              <div className="bg-[#1C1915] p-4 rounded-xl border border-[#332D24] space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-serif font-bold text-sm text-[#1C1A17] flex items-center gap-1.5">
+                  <span className="font-serif font-bold text-sm text-white flex items-center gap-1.5">
                     <FileCheck className="w-4 h-4 text-[#C5A45F]" /> Checklist de Conferência da
                     Mesa
                   </span>
@@ -678,8 +678,8 @@ export default function Tables() {
                     className={
                       physicalChairsInput ===
                       (selectedTable.planned_chairs || selectedTable.capacity)
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-red-600 text-white animate-pulse'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                        : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'
                     }
                   >
                     {physicalChairsInput ===
@@ -691,18 +691,18 @@ export default function Tables() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="plan-chairs" className="text-[11px] text-[#6B6356]">
+                    <Label htmlFor="plan-chairs" className="text-[11px] text-neutral-400">
                       Cadeiras Planejadas:
                     </Label>
                     <Input
                       id="plan-chairs"
                       disabled
                       value={selectedTable.planned_chairs || selectedTable.capacity}
-                      className="bg-neutral-100 font-bold"
+                      className="bg-[#24201B] border-[#383125] text-neutral-300 font-bold"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phys-chairs" className="text-[11px] font-bold text-[#1C1A17]">
+                    <Label htmlFor="phys-chairs" className="text-[11px] font-bold text-white">
                       Cadeiras Físicas Conferidas:
                     </Label>
                     <Input
@@ -711,7 +711,7 @@ export default function Tables() {
                       min={1}
                       value={physicalChairsInput}
                       onChange={(e) => setPhysicalChairsInput(parseInt(e.target.value) || 0)}
-                      className="bg-white font-bold text-base"
+                      className="bg-[#12100E] border-[#383125] text-white font-bold text-base focus:border-[#C5A45F]"
                     />
                   </div>
                 </div>
@@ -719,16 +719,17 @@ export default function Tables() {
                 <div>
                   <Label
                     htmlFor="conf-photo"
-                    className="text-[11px] text-[#6B6356] flex items-center gap-1"
+                    className="text-[11px] text-neutral-400 flex items-center gap-1"
                   >
-                    <Camera className="w-3.5 h-3.5" /> Registro Fotográfico da Mesa Montada:
+                    <Camera className="w-3.5 h-3.5 text-[#C5A45F]" /> Registro Fotográfico da Mesa
+                    Montada:
                   </Label>
                   <Input
                     id="conf-photo"
                     placeholder="URL ou arquivo de foto da conferência..."
                     value={conferencePhotoInput}
                     onChange={(e) => setConferencePhotoInput(e.target.value)}
-                    className="bg-white text-xs h-9"
+                    className="bg-[#12100E] border-[#383125] text-xs h-9 text-white focus:border-[#C5A45F]"
                   />
                   <span className="text-[10px] text-neutral-400 mt-0.5 block">
                     Foto de referência:{' '}
@@ -740,7 +741,7 @@ export default function Tables() {
                 <Button
                   onClick={handleSaveConference}
                   disabled={isUpdatingConference}
-                  className="w-full bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold text-xs h-9"
+                  className="w-full bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold text-xs h-9 rounded-xl shadow-md"
                 >
                   {isUpdatingConference ? 'Salvando...' : 'Salvar Conferência Física da Mesa'}
                 </Button>
@@ -748,27 +749,27 @@ export default function Tables() {
 
               {/* Move guest section if triggered */}
               {guestToMove && (
-                <div className="bg-amber-50 p-3.5 rounded-xl border border-amber-300 space-y-3">
+                <div className="bg-[#261E14] p-3.5 rounded-xl border border-amber-600/40 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                      <MoveRight className="w-4 h-4 text-amber-700" />
+                    <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                      <MoveRight className="w-4 h-4 text-amber-400" />
                       Mover "{guestToMove.name}" para:
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setGuestToMove(null)}
-                      className="text-xs text-neutral-500 h-6 px-2"
+                      className="text-xs text-neutral-400 hover:text-white h-6 px-2"
                     >
                       Cancelar
                     </Button>
                   </div>
                   <div className="flex gap-2">
                     <Select value={targetTableId} onValueChange={setTargetTableId}>
-                      <SelectTrigger className="h-10 text-xs bg-white">
+                      <SelectTrigger className="h-10 text-xs bg-[#171411] border-[#3D3425] text-white">
                         <SelectValue placeholder="Selecione a mesa de destino..." />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-[#1C1813] border-[#3D3425] text-white">
                         {tables
                           .filter((t) => t.id !== selectedTable.id)
                           .map((t) => {
@@ -785,7 +786,7 @@ export default function Tables() {
                     <Button
                       onClick={handleMoveGuest}
                       disabled={!targetTableId || isMoving}
-                      className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold text-xs shrink-0"
+                      className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-semibold text-xs shrink-0 rounded-xl"
                     >
                       {isMoving ? 'Movendo...' : 'Confirmar Mudança'}
                     </Button>
@@ -795,21 +796,21 @@ export default function Tables() {
 
               {/* Guest Roster for this table */}
               <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#6B6356] flex items-center justify-between">
+                <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center justify-between">
                   <span>
                     Ocupantes Vinculados ({getTableGuests(selectedTable.id).length} de{' '}
                     {selectedTable.capacity})
                   </span>
                   {selectedTable.special_needs_note && (
-                    <span className="text-blue-800 font-normal">
+                    <span className="text-sky-300 font-normal">
                       ★ {selectedTable.special_needs_note}
                     </span>
                   )}
                 </div>
 
                 {getTableGuests(selectedTable.id).length === 0 ? (
-                  <div className="text-center py-6 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
-                    <p className="text-xs text-[#6B6356]">Nenhum convidado alocado nesta mesa.</p>
+                  <div className="text-center py-6 bg-[#181512] rounded-xl border border-dashed border-[#2B2620]">
+                    <p className="text-xs text-neutral-400">Nenhum convidado alocado nesta mesa.</p>
                   </div>
                 ) : (
                   <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
@@ -820,21 +821,21 @@ export default function Tables() {
                       return (
                         <div
                           key={guest.id}
-                          className="flex items-center justify-between p-2.5 rounded-lg bg-neutral-50 border border-neutral-200 hover:bg-neutral-100/70 transition-colors"
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-[#1C1915] border border-[#2B2620] hover:bg-[#24201A] transition-colors"
                         >
                           <div>
-                            <div className="font-semibold text-xs text-[#1C1A17] flex items-center gap-1.5">
+                            <div className="font-semibold text-xs text-white flex items-center gap-1.5">
                               {guest.name}
                               {isPresent && (
-                                <Badge className="bg-emerald-600 text-white text-[8px] py-0 px-1">
+                                <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[8px] py-0 px-1">
                                   PRESENTE
                                 </Badge>
                               )}
                             </div>
-                            <div className="text-[10px] text-[#6B6356]">
+                            <div className="text-[10px] text-neutral-400">
                               {targetHonoree && <span>Homenageado: {targetHonoree.name}</span>}
                               {guest.dietary_restriction && (
-                                <span className="text-amber-800 ml-2">
+                                <span className="text-amber-400 ml-2">
                                   ★ {guest.dietary_restriction}
                                 </span>
                               )}
@@ -848,7 +849,7 @@ export default function Tables() {
                               setGuestToMove(guest)
                               setTargetTableId('')
                             }}
-                            className="text-[11px] h-7 text-[#C5A45F] hover:bg-white border-neutral-300 font-medium"
+                            className="text-[11px] h-7 text-[#C5A45F] hover:bg-[#25211B] border-[#383125] font-medium"
                           >
                             Mover
                           </Button>
@@ -861,7 +862,11 @@ export default function Tables() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setSelectedTable(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setSelectedTable(null)}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#24201A]"
+              >
                 Fechar
               </Button>
             </DialogFooter>
@@ -869,15 +874,15 @@ export default function Tables() {
         </Dialog>
       )}
 
-      {/* STRICT CHAIR TRANSFER MODAL (Requisitos C.10 & C.11: Exigir quem solicitou, motivo, origem, destino, autorização do coordenador, horário e BLOQUEIO quando não autorizado) */}
+      {/* STRICT CHAIR TRANSFER MODAL */}
       <Dialog open={isChairModalOpen} onOpenChange={setIsChairModalOpen}>
-        <DialogContent className="sm:max-w-[520px] bg-white">
+        <DialogContent className="sm:max-w-[520px] bg-[#161412] text-white border border-[#383125] rounded-2xl shadow-2xl">
           <form onSubmit={handleRequestChairTransfer}>
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-red-950">
-                <Lock className="w-5 h-5 text-red-600" /> Solicitar Transferência de Cadeiras
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-red-400">
+                <Lock className="w-5 h-5 text-red-400" /> Solicitar Transferência de Cadeiras
               </DialogTitle>
-              <DialogDescription className="text-xs">
+              <DialogDescription className="text-xs text-neutral-400">
                 Qualquer transferência física exige justificativa formal e autorização expressa da
                 coordenação cerimonial (Hugo ou Renato).
               </DialogDescription>
@@ -886,12 +891,17 @@ export default function Tables() {
             <div className="space-y-3 py-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label htmlFor="ct-source">Mesa de Origem *</Label>
+                  <Label htmlFor="ct-source" className="text-neutral-300">
+                    Mesa de Origem *
+                  </Label>
                   <Select value={chairSourceId} onValueChange={setChairSourceId} required>
-                    <SelectTrigger id="ct-source" className="h-9">
+                    <SelectTrigger
+                      id="ct-source"
+                      className="h-9 bg-[#1C1915] border-[#332D24] text-white"
+                    >
                       <SelectValue placeholder="Selecione a origem" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                       {tables.map((t) => (
                         <SelectItem key={t.id} value={t.id}>
                           {t.name} ({t.physical_chairs ?? t.capacity} cad.)
@@ -902,12 +912,17 @@ export default function Tables() {
                 </div>
 
                 <div className="space-y-1">
-                  <Label htmlFor="ct-target">Mesa de Destino *</Label>
+                  <Label htmlFor="ct-target" className="text-neutral-300">
+                    Mesa de Destino *
+                  </Label>
                   <Select value={chairTargetId} onValueChange={setChairTargetId} required>
-                    <SelectTrigger id="ct-target" className="h-9">
+                    <SelectTrigger
+                      id="ct-target"
+                      className="h-9 bg-[#1C1915] border-[#332D24] text-white"
+                    >
                       <SelectValue placeholder="Selecione o destino" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                       {tables
                         .filter((t) => t.id !== chairSourceId)
                         .map((t) => (
@@ -922,7 +937,9 @@ export default function Tables() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label htmlFor="ct-count">Quantidade de Cadeiras *</Label>
+                  <Label htmlFor="ct-count" className="text-neutral-300">
+                    Quantidade de Cadeiras *
+                  </Label>
                   <Input
                     id="ct-count"
                     type="number"
@@ -930,49 +947,56 @@ export default function Tables() {
                     max={10}
                     value={chairCount}
                     onChange={(e) => setChairCount(parseInt(e.target.value) || 1)}
-                    className="h-9 font-bold"
+                    className="h-9 font-bold bg-[#1C1915] border-[#332D24] text-white"
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="ct-requester">Quem Solicitou *</Label>
+                  <Label htmlFor="ct-requester" className="text-neutral-300">
+                    Quem Solicitou *
+                  </Label>
                   <Input
                     id="ct-requester"
                     required
                     placeholder="Ex: Garçom João / Chefe Garçons"
                     value={chairRequester}
                     onChange={(e) => setChairRequester(e.target.value)}
-                    className="h-9"
+                    className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="ct-reason">Motivo da Solicitação *</Label>
+                <Label htmlFor="ct-reason" className="text-neutral-300">
+                  Motivo da Solicitação *
+                </Label>
                 <Input
                   id="ct-reason"
                   required
                   placeholder="Por que mover as cadeiras?"
                   value={chairReason}
                   onChange={(e) => setChairReason(e.target.value)}
-                  className="h-9"
+                  className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-300 space-y-1.5">
+              <div className="p-3 bg-[#261E14] rounded-xl border border-amber-600/40 space-y-1.5">
                 <Label
                   htmlFor="ct-auth"
-                  className="font-bold text-amber-950 flex items-center justify-between"
+                  className="font-bold text-amber-300 flex items-center justify-between"
                 >
                   <span>Autorização do Coordenador (Hugo ou Renato):</span>
-                  <span className="text-[10px] text-amber-800 font-normal">
+                  <span className="text-[10px] text-amber-400 font-normal">
                     Opcional para teste de bloqueio
                   </span>
                 </Label>
                 <Select value={chairAuthorizer} onValueChange={setChairAuthorizer}>
-                  <SelectTrigger id="ct-auth" className="bg-white h-9 border-amber-300">
+                  <SelectTrigger
+                    id="ct-auth"
+                    className="bg-[#171411] h-9 border-amber-500/40 text-white"
+                  >
                     <SelectValue placeholder="Sem autorização (Simular tentativa indevida)" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                     <SelectItem value="">Sem autorização (Simular bloqueio)</SelectItem>
                     <SelectItem value="Hugo Cerimonial">
                       Hugo Cerimonial (Coordenador Chefe)
@@ -982,20 +1006,25 @@ export default function Tables() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-[10px] text-amber-800">
+                <p className="text-[10px] text-amber-400/90">
                   Dica da Demo: Deixe em branco para testar o bloqueio estrito do sistema!
                 </p>
               </div>
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsChairModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsChairModalOpen(false)}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#24201A]"
+              >
                 Cancelar
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmittingTransfer || !chairSourceId || !chairTargetId}
-                className="bg-red-700 hover:bg-red-800 text-white font-bold"
+                className="bg-red-700 hover:bg-red-800 text-white font-bold rounded-xl"
               >
                 {isSubmittingTransfer ? 'Processando...' : 'Processar Solicitação'}
               </Button>
@@ -1004,31 +1033,32 @@ export default function Tables() {
         </DialogContent>
       </Dialog>
 
-      {/* BLOCKED TRANSFER ALERT RESULT MODAL (Requirement C: Sistema bloqueia sem autorização) */}
+      {/* BLOCKED TRANSFER ALERT RESULT MODAL */}
       <Dialog
         open={!!blockedTransferResult}
         onOpenChange={(open) => !open && setBlockedTransferResult(null)}
       >
-        <DialogContent className="sm:max-w-[480px] bg-white border-4 border-red-600">
+        <DialogContent className="sm:max-w-[480px] bg-[#1A1111] text-white border-2 border-red-600 rounded-2xl shadow-2xl">
           <DialogHeader>
-            <div className="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-2 border border-red-300">
+            <div className="w-14 h-14 rounded-full bg-red-950/80 text-red-400 flex items-center justify-center mx-auto mb-2 border border-red-700">
               <XCircle className="w-8 h-8" />
             </div>
-            <DialogTitle className="text-xl font-serif font-bold text-center text-red-950">
+            <DialogTitle className="text-xl font-serif font-bold text-center text-red-300">
               TENTATIVA BLOQUEADA PELO SISTEMA
             </DialogTitle>
-            <DialogDescription className="text-center text-xs text-neutral-600">
-              A alteração de cadeiras foi <strong>RECUSADA E REGISTRADA NO HISTÓRICO</strong> de
+            <DialogDescription className="text-center text-xs text-neutral-400">
+              A alteração de cadeiras foi{' '}
+              <strong className="text-red-300">RECUSADA E REGISTRADA NO HISTÓRICO</strong> de
               auditoria.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-4 bg-red-50 rounded-xl border border-red-200 text-xs space-y-2 text-red-900">
+          <div className="p-4 bg-[#2A1515] rounded-xl border border-red-800/80 text-xs space-y-2 text-red-200">
             <div>
-              <strong>Motivo do Bloqueio:</strong>
-              <p className="mt-0.5">{blockedTransferResult?.rejection_reason}</p>
+              <strong className="text-white">Motivo do Bloqueio:</strong>
+              <p className="mt-0.5 text-red-300">{blockedTransferResult?.rejection_reason}</p>
             </div>
-            <div className="border-t border-red-200 pt-2 text-[11px] text-neutral-600">
+            <div className="border-t border-red-800/60 pt-2 text-[11px] text-neutral-400">
               Horário do registro:{' '}
               {blockedTransferResult?.timestamp
                 ? new Date(blockedTransferResult.timestamp).toLocaleTimeString('pt-BR')
@@ -1043,7 +1073,7 @@ export default function Tables() {
                 setBlockedTransferResult(null)
                 setIsChairModalOpen(false)
               }}
-              className="w-full bg-[#1C1A17] hover:bg-[#282521] text-white font-bold"
+              className="w-full bg-[#141210] hover:bg-[#221E19] text-[#C5A45F] border border-[#3D3425] font-bold rounded-xl"
             >
               Compreendido (Manter Layout Oficial)
             </Button>

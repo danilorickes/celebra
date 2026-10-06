@@ -8,104 +8,71 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Change the colors to match the design system */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+  :root,
+  .dark {
+    /* Celebra Black Moderno Theme */
+    /* Deep true dark background with subtle warm undertone */
+    --background: 24 10% 6%; /* #0F0E0D */
+    --foreground: 40 20% 96%; /* #F6F4F0 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card layer: elevated dark surface */
+    --card: 24 9% 10%; /* #1A1816 */
+    --card-foreground: 40 20% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Popover/dialog layer: slightly higher elevation */
+    --popover: 24 9% 12%; /* #211E1B */
+    --popover-foreground: 40 20% 96%;
 
-    --primary: 40 48% 57%; /* #C5A45F Muted Gold */
-    --primary-foreground: 30 20% 12%;
+    /* Primary: Refined Gold (#C5A45F) */
+    --primary: 40 48% 57%;
+    --primary-foreground: 24 15% 8%; /* Very dark text on bright gold */
 
-    --secondary: 40 20% 94%;
-    --secondary-foreground: 30 20% 15%;
+    /* Secondary: Dark slate-bronze surface */
+    --secondary: 24 8% 16%; /* #2B2824 */
+    --secondary-foreground: 40 25% 90%;
 
-    --muted: 40 15% 92%;
-    --muted-foreground: 30 10% 45%;
+    /* Muted: Subtle borders and background fills */
+    --muted: 24 7% 14%; /* #24211D */
+    --muted-foreground: 36 10% 64%; /* #A8A29A - High-legibility neutral */
 
-    --accent: 210 40% 98%;
-    --accent-foreground: 222.2 84% 4.9%;
+    /* Accent: Highlighting hover and active states */
+    --accent: 40 48% 57%;
+    --accent-foreground: 24 15% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Operational status semantic colors */
+    --destructive: 0 78% 55%; /* High-contrast clear red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Borders & Inputs */
+    --border: 24 8% 18%; /* #312D28 */
+    --input: 24 8% 18%;
+    --ring: 40 48% 57%; /* Gold focus ring */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Sidebar theme tokens */
+    --sidebar-background: 24 10% 7%; /* #131210 */
+    --sidebar-foreground: 40 18% 88%;
+    --sidebar-primary: 40 48% 57%;
+    --sidebar-primary-foreground: 24 15% 8%;
+    --sidebar-accent: 24 8% 14%;
+    --sidebar-accent-foreground: 40 25% 95%;
+    --sidebar-border: 24 8% 15%;
+    --sidebar-ring: 40 48% 57%;
 
-    --sidebar-foreground: 222.2 84% 4.9%;
-
-    --sidebar-primary: 222.2 84% 4.9%;
-
-    --sidebar-primary-foreground: 0 0% 100%;
-
-    --sidebar-accent: 210 40% 98%;
-
-    --sidebar-accent-foreground: 222.2 84% 4.9%;
-
-    --sidebar-border: 214.3 31.8% 91.4%;
-
-    --sidebar-ring: 222.2 84% 4.9%;
-
-    --chart-1: 34 100% 44%;
-    --chart-2: 189 100% 38%;
-    --chart-3: 209 100% 32%;
-    --chart-4: 42 100% 50%;
-    --chart-5: 33 100% 50%;
+    --chart-1: 40 48% 57%;
+    --chart-2: 152 65% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 0 78% 55%;
+    --chart-5: 250 70% 65%;
   }
 
-  .dark {
-    /* Change the colors to match the design system consistent with the dark mode */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 84% 4.9%;
-
-    --secondary: 222.2 84% 4.9%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 222.2 84% 4.9%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 222.2 84% 4.9%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 222.2 84% 4.9%;
-    --input: 222.2 84% 4.9%;
-    --ring: 214.3 31.8% 91.4%;
-    --sidebar-background: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 222.2 84% 4.9%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222.2 84% 4.9%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222.2 84% 4.9%;
-    --sidebar-ring: 222.2 84% 4.9%;
-
-    --chart-1: 270 100% 44%;
-    --chart-2: 164 100% 38%;
-    --chart-3: 43 100% 32%;
-    --chart-4: 340 100% 50%;
-    --chart-5: 10 100% 50%;
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* NEVER REMOVE THIS */

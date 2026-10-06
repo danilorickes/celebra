@@ -189,10 +189,10 @@ export default function Dashboard() {
             <Sparkles className="w-4 h-4" /> Centro de Comando Operacional — Festa dos Destaques
             2026
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-white tracking-tight">
             Dashboard Geral de Prontidão do Evento
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+          <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
             Coordenação Geral: Hugo Cerimonial & Renato Apoio • 30 Homenageados • ~400 Convidados •
             20 Mesas
           </p>
@@ -200,8 +200,8 @@ export default function Dashboard() {
 
         <div className="flex items-center gap-2">
           <Link to={`/events/${eventId}/live`}>
-            <Button className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-bold text-xs h-10 gap-2 border border-[#3D3833] shadow">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
+            <Button className="bg-[#1C1915] hover:bg-[#26221C] text-[#C5A45F] font-bold text-xs h-10 gap-2 border border-[#3D3425] shadow-lg hover:shadow-[0_0_15px_rgba(197,164,95,0.2)] transition-all">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
               Entrar no Modo Evento ao Vivo
             </Button>
           </Link>
@@ -269,177 +269,181 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Pendências e Críticas */}
         <Link to={`/events/${eventId}/checklist`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-[#C5A45F]/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">Pendências</span>
+              <span className="text-[10px] uppercase font-bold text-neutral-400">Pendências</span>
               <Badge
                 className={`text-[10px] font-bold ${
                   criticalChecklistPending.length > 0
-                    ? 'bg-red-600 text-white'
-                    : 'bg-emerald-600 text-white'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                 }`}
               >
                 {criticalChecklistPending.length} Críticas
               </Badge>
             </div>
-            <div className="text-3xl font-serif font-bold text-[#1C1A17] mt-1 group-hover:text-[#C5A45F]">
+            <div className="text-3xl font-serif font-bold text-white mt-1 group-hover:text-[#C5A45F] transition-colors">
               {totalPendingChecklist}
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
               <span>de {checklist.length} itens totais</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F] group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 2: Entradas / Check-in */}
         <Link to={`/events/${eventId}/checkin`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-emerald-500/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+              <span className="text-[10px] uppercase font-bold text-neutral-400">
                 Entradas Recepção
               </span>
-              <Badge className="bg-emerald-100 text-emerald-900 border-emerald-300 text-[10px] font-bold">
+              <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
                 Check-in QR
               </Badge>
             </div>
-            <div className="text-3xl font-serif font-bold text-emerald-700 mt-1">
+            <div className="text-3xl font-serif font-bold text-emerald-400 mt-1">
               {presentGuests}{' '}
               <span className="text-base font-normal text-neutral-400">/ {totalGuests}</span>
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
               <span>
                 {totalGuests > 0 ? Math.round((presentGuests / totalGuests) * 100) : 0}% presentes
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 3: Mesas com Divergência */}
         <Link to={`/events/${eventId}/tables`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-amber-500/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+              <span className="text-[10px] uppercase font-bold text-neutral-400">
                 Mesas & Cadeiras
               </span>
               <Badge
                 className={`text-[10px] font-bold ${
                   tablesWithDivergence.length > 0
-                    ? 'bg-red-600 text-white animate-pulse'
-                    : 'bg-emerald-600 text-white'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                 }`}
               >
                 {tablesWithDivergence.length > 0 ? 'Divergência!' : '100% OK'}
               </Badge>
             </div>
-            <div className="text-3xl font-serif font-bold text-[#1C1A17] mt-1">
+            <div className="text-3xl font-serif font-bold text-white mt-1 group-hover:text-[#C5A45F] transition-colors">
               {tablesWithDivergence.length}{' '}
               <span className="text-sm font-normal text-neutral-400">mesa(s)</span>
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
               <span>{tables.length} mesas planejadas</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F] group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 4: Liberação Buffet */}
         <Link to={`/events/${eventId}/buffet`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-indigo-500/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+              <span className="text-[10px] uppercase font-bold text-neutral-400">
                 Buffet em Ondas
               </span>
-              <Badge className="bg-indigo-100 text-indigo-900 border-indigo-300 text-[10px] font-bold">
+              <Badge className="bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">
                 Ondas de 2-3
               </Badge>
             </div>
-            <div className="text-3xl font-serif font-bold text-indigo-700 mt-1">
+            <div className="text-3xl font-serif font-bold text-indigo-400 mt-1">
               {tablesReleasedBuffet}{' '}
               <span className="text-sm font-normal text-neutral-400">liberadas</span>
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
               <span>{releases.length} ondas realizadas</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 5: Próximo Homenageado */}
         <Link to={`/events/${eventId}/honorees`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-[#C5A45F]/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+              <span className="text-[10px] uppercase font-bold text-neutral-400">
                 Homenageados (30)
               </span>
-              <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold">
+              <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#3D3425] text-[10px] font-bold">
                 No Palco Agora
               </Badge>
             </div>
-            <div className="font-serif font-bold text-base text-[#1C1A17] mt-1 truncate">
+            <div className="font-serif font-bold text-base text-white mt-1 truncate group-hover:text-[#C5A45F] transition-colors">
               {onStageHonoree ? onStageHonoree.name : 'Aguardando Início'}
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
-              <span>Próximo: {nextHonoree ? nextHonoree.name : '—'}</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
+              <span className="truncate">Próximo: {nextHonoree ? nextHonoree.name : '—'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F] shrink-0 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 6: Restrições Alimentares */}
         <Link to={`/events/${eventId}/buffet`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-amber-500/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+              <span className="text-[10px] uppercase font-bold text-neutral-400">
                 Pratos Especiais
               </span>
               <Badge
                 className={`text-[10px] font-bold ${
-                  pendingDietary > 0 ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white'
+                  pendingDietary > 0
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                 }`}
               >
                 {pendingDietary > 0 ? 'Pendente' : '100% Entregue'}
               </Badge>
             </div>
-            <div className="text-3xl font-serif font-bold text-amber-700 mt-1">
+            <div className="text-3xl font-serif font-bold text-amber-400 mt-1">
               {pendingDietary} <span className="text-sm font-normal text-neutral-400">pratos</span>
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
               <span>{dietaryTasks.length} restrições severas</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 7: Ocorrências Abertas */}
         <Link to={`/events/${eventId}/occurrences`}>
-          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+          <Card className="hover:border-red-500/60 hover:shadow-elevation transition-all border border-[#2B2620] bg-[#161412] p-4 h-full cursor-pointer group rounded-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#6B6356]">Ocorrências</span>
+              <span className="text-[10px] uppercase font-bold text-neutral-400">Ocorrências</span>
               <Badge
                 className={`text-[10px] font-bold ${
-                  openOccurrences > 0 ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+                  openOccurrences > 0
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                 }`}
               >
                 {openOccurrences} Abertas
               </Badge>
             </div>
-            <div className="text-3xl font-serif font-bold text-[#1C1A17] mt-1">
+            <div className="text-3xl font-serif font-bold text-white mt-1 group-hover:text-red-400 transition-colors">
               {occurrences.length}
             </div>
-            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+            <div className="text-[11px] text-neutral-400 mt-1 flex items-center justify-between">
               <span>todas auditadas</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:translate-x-1 transition-transform" />
             </div>
           </Card>
         </Link>
 
         {/* Card 8: Responsável para Acionar */}
-        <div className="bg-[#1C1A17] text-white p-4 rounded-2xl border border-[#332E27] flex flex-col justify-between">
+        <div className="bg-[#181512] text-white p-4 rounded-2xl border border-[#332D24] shadow-elevation flex flex-col justify-between">
           <div>
             <div className="text-[10px] font-bold uppercase tracking-wider text-[#C5A45F]">
-              ACIONAL PRIORITÁRIO
+              ACIONAMENTO PRIORITÁRIO
             </div>
             <div className="font-serif font-bold text-base text-white mt-1 leading-snug">
               {urgentResponsible}
@@ -449,7 +453,7 @@ export default function Dashboard() {
           <Link to={`/events/${eventId}/live`}>
             <Button
               size="sm"
-              className="w-full mt-2 bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold text-xs h-8"
+              className="w-full mt-2 bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold text-xs h-9 rounded-xl shadow-md hover:shadow-[0_0_15px_rgba(197,164,95,0.3)] transition-all"
             >
               Acionar Agora
             </Button>
@@ -460,49 +464,49 @@ export default function Dashboard() {
       {/* QUICK WORKFLOW ACCESS SHORTCUTS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
         <Link to={`/events/${eventId}/checkin`}>
-          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
-            <QrCode className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
-            <span className="text-xs font-bold text-[#1C1A17] block">Check-in QR</span>
+          <div className="p-3 bg-[#161412] rounded-xl border border-[#2B2620] hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm group">
+            <QrCode className="w-5 h-5 mx-auto text-[#C5A45F] mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-white block">Check-in QR</span>
             <span className="text-[10px] text-neutral-400">Recepção</span>
           </div>
         </Link>
 
         <Link to={`/events/${eventId}/tables`}>
-          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
-            <Users className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
-            <span className="text-xs font-bold text-[#1C1A17] block">Mapa 20 Mesas</span>
+          <div className="p-3 bg-[#161412] rounded-xl border border-[#2B2620] hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm group">
+            <Users className="w-5 h-5 mx-auto text-[#C5A45F] mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-white block">Mapa 20 Mesas</span>
             <span className="text-[10px] text-neutral-400">Trava & Cadeiras</span>
           </div>
         </Link>
 
         <Link to={`/events/${eventId}/checklist`}>
-          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
-            <ShieldAlert className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
-            <span className="text-xs font-bold text-[#1C1A17] block">Checklist</span>
+          <div className="p-3 bg-[#161412] rounded-xl border border-[#2B2620] hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm group">
+            <ShieldAlert className="w-5 h-5 mx-auto text-[#C5A45F] mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-white block">Checklist</span>
             <span className="text-[10px] text-neutral-400">16 Áreas</span>
           </div>
         </Link>
 
         <Link to={`/events/${eventId}/buffet`}>
-          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
-            <Utensils className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
-            <span className="text-xs font-bold text-[#1C1A17] block">Buffet & Telão</span>
+          <div className="p-3 bg-[#161412] rounded-xl border border-[#2B2620] hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm group">
+            <Utensils className="w-5 h-5 mx-auto text-[#C5A45F] mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-white block">Buffet & Telão</span>
             <span className="text-[10px] text-neutral-400">Ondas 2-3</span>
           </div>
         </Link>
 
         <Link to={`/events/${eventId}/honorees`}>
-          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
-            <Award className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
-            <span className="text-xs font-bold text-[#1C1A17] block">30 Homenageados</span>
+          <div className="p-3 bg-[#161412] rounded-xl border border-[#2B2620] hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm group">
+            <Award className="w-5 h-5 mx-auto text-[#C5A45F] mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-white block">30 Homenageados</span>
             <span className="text-[10px] text-neutral-400">11 Estados</span>
           </div>
         </Link>
 
         <Link to={`/events/${eventId}/live`}>
-          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
-            <Clock className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
-            <span className="text-xs font-bold text-[#1C1A17] block">Evento ao Vivo</span>
+          <div className="p-3 bg-[#161412] rounded-xl border border-[#2B2620] hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm group">
+            <Clock className="w-5 h-5 mx-auto text-[#C5A45F] mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-white block">Evento ao Vivo</span>
             <span className="text-[10px] text-neutral-400">Centro Tempo Real</span>
           </div>
         </Link>
@@ -511,19 +515,19 @@ export default function Dashboard() {
       {/* WHATSAPP ACTIVITY & AUDIT LOG PREVIEW (Requirements L & M) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Simulated WhatsApp Feed */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+        <Card className="bg-[#161412] border border-[#2B2620] shadow-elevation rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A] flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-serif font-bold text-[#1C1A17] flex items-center gap-2">
-                <Send className="w-4 h-4 text-emerald-600" />
+              <CardTitle className="text-sm font-serif font-bold text-white flex items-center gap-2">
+                <Send className="w-4 h-4 text-emerald-400" />
                 WhatsApp Operacional Simulado
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-neutral-400">
                 {messages.length} disparos registrados (ondas de buffet, avisos aos homenageados,
                 cobranças de checklist)
               </CardDescription>
             </div>
-            <Badge className="bg-emerald-100 text-emerald-900 border-emerald-300 text-[10px]">
+            <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px]">
               Canal Principal
             </Badge>
           </CardHeader>
@@ -531,13 +535,15 @@ export default function Dashboard() {
             {messages.slice(0, 5).map((m) => (
               <div
                 key={m.id}
-                className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs space-y-1"
+                className="p-3 rounded-xl bg-[#1D1A16] border border-[#2B2620] text-xs space-y-1"
               >
                 <div className="flex items-center justify-between">
-                  <strong className="text-[#1C1A17]">{m.recipient_name}</strong>
-                  <Badge className="bg-neutral-800 text-[#C5A45F] text-[9px]">{m.status}</Badge>
+                  <strong className="text-neutral-100">{m.recipient_name}</strong>
+                  <Badge className="bg-[#2B2620] text-[#C5A45F] border border-[#3E362B] text-[9px]">
+                    {m.status}
+                  </Badge>
                 </div>
-                <p className="text-neutral-600 text-[11px] leading-relaxed">{m.message}</p>
+                <p className="text-neutral-300 text-[11px] leading-relaxed">{m.message}</p>
                 <div className="text-[9px] text-neutral-400 flex items-center justify-between pt-1">
                   <span>Categoria: {m.category}</span>
                   <span>
@@ -550,19 +556,23 @@ export default function Dashboard() {
         </Card>
 
         {/* Live Ocorrências & Ações Rápidas */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+        <Card className="bg-[#161412] border border-[#2B2620] shadow-elevation rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A] flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-serif font-bold text-[#1C1A17] flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <CardTitle className="text-sm font-serif font-bold text-white flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
                 Ocorrências & Resoluções de Salão
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-neutral-400">
                 Histórico com responsável, setor e solução registrada
               </CardDescription>
             </div>
             <Link to={`/events/${eventId}/occurrences`}>
-              <Button size="sm" variant="outline" className="text-xs h-7 text-[#C5A45F]">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs h-7 text-[#C5A45F] border-[#383125] bg-[#1F1C18] hover:bg-[#28241F]"
+              >
                 Ver Todas
               </Button>
             </Link>
@@ -571,21 +581,21 @@ export default function Dashboard() {
             {occurrences.slice(0, 5).map((o) => (
               <div
                 key={o.id}
-                className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs space-y-1"
+                className="p-3 rounded-xl bg-[#1D1A16] border border-[#2B2620] text-xs space-y-1"
               >
                 <div className="flex items-center justify-between">
-                  <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px]">
+                  <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[9px]">
                     {o.category}
                   </Badge>
-                  <span className="text-[10px] text-neutral-500">Resp: {o.responsible}</span>
+                  <span className="text-[10px] text-neutral-400">Resp: {o.responsible}</span>
                 </div>
-                <p className="text-[#1C1A17] font-semibold text-[11px]">{o.description}</p>
+                <p className="text-neutral-100 font-semibold text-[11px]">{o.description}</p>
                 {o.solution ? (
-                  <div className="text-[10px] text-emerald-700 bg-emerald-50 p-1 rounded font-medium">
+                  <div className="text-[10px] text-emerald-400 bg-emerald-950/40 border border-emerald-900/60 p-1.5 rounded font-medium">
                     ✓ Solução: {o.solution}
                   </div>
                 ) : (
-                  <div className="text-[10px] text-red-600 font-bold">
+                  <div className="text-[10px] text-red-400 bg-red-950/30 border border-red-900/40 p-1.5 rounded font-bold">
                     Pendente de resolução pela coordenação
                   </div>
                 )}

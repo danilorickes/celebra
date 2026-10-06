@@ -284,10 +284,10 @@ export default function Honorees() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <Award className="w-4 h-4" /> Cerimonial de Premiação & Protocolo
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-white tracking-tight">
             Painel dos 30 Homenageados da Festa
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+          <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
             11 estados operacionais, recálculo automático de chamadas, condutores responsáveis e
             trilhas musicais.
           </p>
@@ -296,12 +296,12 @@ export default function Honorees() {
         {/* Live Stage Highlights */}
         <div className="flex items-center gap-2">
           {onStageHonoree && (
-            <Badge className="bg-emerald-600 text-white font-serif text-xs py-1.5 px-3">
+            <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-serif text-xs py-1.5 px-3">
               No Palco Agora: #{onStageHonoree.tribute_order} {onStageHonoree.name}
             </Badge>
           )}
           {nextHonoree && (
-            <Badge className="bg-amber-500 text-white font-serif text-xs py-1.5 px-3 animate-pulse">
+            <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-serif text-xs py-1.5 px-3 animate-pulse">
               Próximo: #{nextHonoree.tribute_order} {nextHonoree.name}
             </Badge>
           )}
@@ -309,24 +309,24 @@ export default function Honorees() {
       </div>
 
       {/* Control / Search Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-neutral-200">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#161412] p-3.5 rounded-2xl border border-[#2B2620] shadow-elevation">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3" />
           <Input
             placeholder="Buscar por nome do homenageado ou acompanhante..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-10 text-xs bg-white"
+            className="pl-10 h-10 text-xs bg-[#1C1915] border-[#332D24] text-white focus:border-[#C5A45F]"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-[#6B6356]" />
+          <Filter className="w-4 h-4 text-neutral-400" />
           <Select value={filterState} onValueChange={setFilterState}>
-            <SelectTrigger className="w-[200px] h-10 text-xs bg-white">
+            <SelectTrigger className="w-[200px] h-10 text-xs bg-[#1C1915] border-[#332D24] text-white">
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
               <SelectItem value="ALL">Todos os Estados ({honorees.length})</SelectItem>
               {Object.entries(OPERATIONAL_STATES).map(([k, cfg]) => (
                 <SelectItem key={k} value={k}>
@@ -350,26 +350,26 @@ export default function Honorees() {
           return (
             <div
               key={h.id}
-              className={`rounded-2xl p-5 border-2 transition-all bg-white shadow-sm flex flex-col justify-between ${
+              className={`rounded-2xl p-5 border transition-all bg-[#161412] shadow-elevation flex flex-col justify-between ${
                 isOnStage
-                  ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500 shadow-md'
+                  ? 'border-emerald-500 bg-[#121F16] ring-2 ring-emerald-500 shadow-md'
                   : isNext
-                    ? 'border-amber-400 bg-amber-50/20 ring-2 ring-amber-400'
-                    : 'border-neutral-200 hover:border-[#C5A45F]'
+                    ? 'border-amber-400 bg-[#1F1911] ring-2 ring-amber-400'
+                    : 'border-[#2B2620] hover:border-[#C5A45F]'
               }`}
             >
               <div>
                 {/* Header: Order badge + State Badge */}
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-[#1C1A17] text-[#C5A45F] font-serif font-bold text-sm flex items-center justify-center shrink-0">
+                    <span className="w-8 h-8 rounded-full bg-[#24201B] border border-[#383125] text-[#C5A45F] font-serif font-bold text-sm flex items-center justify-center shrink-0">
                       #{h.tribute_order || '•'}
                     </span>
                     <div>
-                      <h3 className="font-serif font-bold text-base text-[#1C1A17] leading-tight">
+                      <h3 className="font-serif font-bold text-base text-white leading-tight">
                         {h.name}
                       </h3>
-                      <div className="text-[11px] text-[#6B6356] mt-0.5">
+                      <div className="text-[11px] text-neutral-400 mt-0.5">
                         Mesa:{' '}
                         <strong className="text-[#C5A45F]">
                           {assignedTable?.name || 'Mesa 01'}
@@ -384,26 +384,29 @@ export default function Honorees() {
                 </div>
 
                 {/* Presentation & Details */}
-                <div className="space-y-2 text-xs py-2 border-t border-neutral-100">
+                <div className="space-y-2 text-xs py-2 border-t border-[#25201A]">
                   {h.escort_name && (
-                    <div className="text-neutral-600 flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5 text-neutral-400" />
+                    <div className="text-neutral-300 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-neutral-500" />
                       <span>
-                        Acompanhante: <strong>{h.escort_name}</strong>
+                        Acompanhante: <strong className="text-white">{h.escort_name}</strong>
                       </span>
                     </div>
                   )}
 
-                  <div className="text-neutral-600 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                  <div className="text-neutral-300 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-neutral-500" />
                     <span>
-                      Condutor: <strong>{h.conductor_responsible || 'Renato Apoio'}</strong>
+                      Condutor:{' '}
+                      <strong className="text-white">
+                        {h.conductor_responsible || 'Renato Apoio'}
+                      </strong>
                     </span>
                   </div>
 
                   {h.music_cue && (
-                    <div className="text-[11px] text-purple-900 bg-purple-50 p-1.5 rounded flex items-center gap-1.5">
-                      <Music className="w-3.5 h-3.5 text-purple-700" />
+                    <div className="text-[11px] text-purple-300 bg-purple-950/40 border border-purple-800/60 p-2 rounded-xl flex items-center gap-1.5">
+                      <Music className="w-3.5 h-3.5 text-purple-400" />
                       <span>Trilha: {h.music_cue}</span>
                     </div>
                   )}
@@ -411,7 +414,7 @@ export default function Honorees() {
               </div>
 
               {/* Action footer */}
-              <div className="pt-3 border-t border-neutral-100 space-y-2">
+              <div className="pt-3 border-t border-[#25201A] space-y-2">
                 {/* Stepper buttons according to state */}
                 <div className="grid grid-cols-2 gap-2">
                   {stKey === 'AGUARDANDO' && (
@@ -423,7 +426,7 @@ export default function Honorees() {
                           `Olá ${h.name}! Informamos que a sua homenagem na Festa dos Destaques 2026 está próxima. O apoio ${h.conductor_responsible || 'Renato'} irá localizá-lo em sua mesa (${assignedTable?.name || 'Mesa'}).`,
                         )
                       }}
-                      className="text-xs h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-1"
+                      className="text-xs h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-1 rounded-xl"
                     >
                       <Send className="w-3 h-3" /> [1] Avisar WhatsApp
                     </Button>
@@ -432,7 +435,7 @@ export default function Honorees() {
                     <Button
                       size="sm"
                       onClick={() => handleAdvanceState(h, 'CONFIRMOU_RECEBIMENTO')}
-                      className="text-xs h-8 bg-cyan-700 hover:bg-cyan-800 text-white font-bold"
+                      className="text-xs h-8 bg-cyan-700 hover:bg-cyan-800 text-white font-bold rounded-xl"
                     >
                       [2] Confirmou Ciente
                     </Button>
@@ -441,7 +444,7 @@ export default function Honorees() {
                     <Button
                       size="sm"
                       onClick={() => handleAdvanceState(h, 'EM_PREPARACAO')}
-                      className="text-xs h-8 bg-purple-700 hover:bg-purple-800 text-white font-bold"
+                      className="text-xs h-8 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl"
                     >
                       [3] Em Preparação
                     </Button>
@@ -450,7 +453,7 @@ export default function Honorees() {
                     <Button
                       size="sm"
                       onClick={() => handleAdvanceState(h, 'PROXIMO')}
-                      className="text-xs h-8 bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                      className="text-xs h-8 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl"
                     >
                       [4] Chamar p/ Recuo
                     </Button>
@@ -459,7 +462,7 @@ export default function Honorees() {
                     <Button
                       size="sm"
                       onClick={() => handleAdvanceState(h, 'NO_PALCO')}
-                      className="text-xs h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                      className="text-xs h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
                     >
                       [5] Subir ao Palco!
                     </Button>
@@ -468,7 +471,7 @@ export default function Honorees() {
                     <Button
                       size="sm"
                       onClick={() => handleAdvanceState(h, 'FOTOGRAFIA')}
-                      className="text-xs h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+                      className="text-xs h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl"
                     >
                       [6] Ir p/ Fotografia
                     </Button>
@@ -477,13 +480,13 @@ export default function Honorees() {
                     <Button
                       size="sm"
                       onClick={() => handleAdvanceState(h, 'CONCLUIDO')}
-                      className="text-xs h-8 bg-neutral-800 hover:bg-neutral-900 text-white font-bold"
+                      className="text-xs h-8 bg-[#24201B] hover:bg-[#322C25] text-white border border-[#3D3528] font-bold rounded-xl"
                     >
                       [7] Finalizar
                     </Button>
                   )}
                   {stKey === 'CONCLUIDO' && (
-                    <div className="col-span-2 text-center text-xs text-emerald-700 font-semibold py-1">
+                    <div className="col-span-2 text-center text-xs text-emerald-300 font-semibold py-1 bg-emerald-950/40 rounded-xl border border-emerald-800/60">
                       ✓ Homenagem Realizada
                     </div>
                   )}
@@ -500,7 +503,7 @@ export default function Honorees() {
                       setEditMusic(h.music_cue || '')
                       setEditResources(h.stage_resources || '')
                     }}
-                    className={`text-xs h-8 border-neutral-300 font-medium ${
+                    className={`text-xs h-8 border-[#332D24] text-neutral-300 hover:bg-[#201D18] font-medium rounded-xl ${
                       stKey === 'CONCLUIDO' ? 'col-span-2' : ''
                     }`}
                   >
@@ -516,32 +519,37 @@ export default function Honorees() {
       {/* EDIT HONOREE MODAL */}
       {selectedHonoree && (
         <Dialog open={!!selectedHonoree} onOpenChange={(open) => !open && setSelectedHonoree(null)}>
-          <DialogContent className="sm:max-w-[550px] bg-white">
+          <DialogContent className="sm:max-w-[550px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
             <DialogHeader>
               <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-full bg-[#1C1A17] text-[#C5A45F] font-serif font-bold text-xs flex items-center justify-center">
+                <span className="w-7 h-7 rounded-full bg-[#24201B] border border-[#383125] text-[#C5A45F] font-serif font-bold text-xs flex items-center justify-center">
                   #{selectedHonoree.tribute_order}
                 </span>
-                <DialogTitle className="font-serif text-xl">{selectedHonoree.name}</DialogTitle>
+                <DialogTitle className="font-serif text-xl text-white">
+                  {selectedHonoree.name}
+                </DialogTitle>
               </div>
-              <DialogDescription>
+              <DialogDescription className="text-neutral-400 text-xs">
                 Configuração operacional de palco, acompanhante, condutor e áudio.
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-2 text-xs">
               <div className="space-y-1">
-                <Label htmlFor="h-state" className="font-bold">
+                <Label htmlFor="h-state" className="font-bold text-neutral-300">
                   Estado Operacional Atual:
                 </Label>
                 <Select
                   value={editState}
                   onValueChange={(v) => setEditState(v as HonoreeOperationalState)}
                 >
-                  <SelectTrigger id="h-state" className="h-10 bg-white">
+                  <SelectTrigger
+                    id="h-state"
+                    className="h-10 bg-[#1C1915] border-[#332D24] text-white"
+                  >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                     {Object.entries(OPERATIONAL_STATES).map(([k, cfg]) => (
                       <SelectItem key={k} value={k}>
                         {cfg.label}
@@ -553,56 +561,68 @@ export default function Honorees() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label htmlFor="h-escort">Acompanhante:</Label>
+                  <Label htmlFor="h-escort" className="text-neutral-300">
+                    Acompanhante:
+                  </Label>
                   <Input
                     id="h-escort"
                     value={editEscort}
                     onChange={(e) => setEditEscort(e.target.value)}
-                    className="h-9"
+                    className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="h-cond">Condutor Responsável:</Label>
+                  <Label htmlFor="h-cond" className="text-neutral-300">
+                    Condutor Responsável:
+                  </Label>
                   <Input
                     id="h-cond"
                     value={editConductor}
                     onChange={(e) => setEditConductor(e.target.value)}
-                    className="h-9"
+                    className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="h-music">Música / Deixa de Entrada:</Label>
+                <Label htmlFor="h-music" className="text-neutral-300">
+                  Música / Deixa de Entrada:
+                </Label>
                 <Input
                   id="h-music"
                   placeholder="Ex: Fanfarra Destaques Trilha 12"
                   value={editMusic}
                   onChange={(e) => setEditMusic(e.target.value)}
-                  className="h-9"
+                  className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="h-res">Recursos de Palco / Especial:</Label>
+                <Label htmlFor="h-res" className="text-neutral-300">
+                  Recursos de Palco / Especial:
+                </Label>
                 <Input
                   id="h-res"
                   placeholder="Ex: Rampa de acesso, microfone sem fio, slide no telão..."
                   value={editResources}
                   onChange={(e) => setEditResources(e.target.value)}
-                  className="h-9"
+                  className="h-9 bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setSelectedHonoree(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setSelectedHonoree(null)}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#201D18]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSaveHonoree}
                 disabled={isUpdating}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold"
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl"
               >
                 {isUpdating ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
@@ -614,40 +634,46 @@ export default function Honorees() {
       {/* WHATSAPP MODAL FOR HONOREE */}
       {wpModalHonoree && (
         <Dialog open={!!wpModalHonoree} onOpenChange={(open) => !open && setWpModalHonoree(null)}>
-          <DialogContent className="sm:max-w-[480px] bg-white border-2 border-emerald-500">
+          <DialogContent className="sm:max-w-[480px] bg-[#141E17] text-white border border-emerald-500/60 rounded-2xl shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-950">
-                <Send className="w-5 h-5 text-emerald-600" /> Aviso de Chamada via WhatsApp
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-300">
+                <Send className="w-5 h-5 text-emerald-400" /> Aviso de Chamada via WhatsApp
               </DialogTitle>
-              <DialogDescription>
-                Homenageado: <strong>{wpModalHonoree.name}</strong> • Ordem: #
-                {wpModalHonoree.tribute_order}
+              <DialogDescription className="text-xs text-neutral-400">
+                Homenageado: <strong className="text-white">{wpModalHonoree.name}</strong> • Ordem:
+                #{wpModalHonoree.tribute_order}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 py-2 text-xs">
-              <Label htmlFor="h-wp-text">Mensagem para o Homenageado:</Label>
+              <Label htmlFor="h-wp-text" className="text-neutral-300">
+                Mensagem para o Homenageado:
+              </Label>
               <textarea
                 id="h-wp-text"
                 rows={3}
                 value={wpMsg}
                 onChange={(e) => setWpMsg(e.target.value)}
-                className="w-full rounded-xl border border-neutral-300 p-2.5 text-xs focus:ring-2 focus:ring-[#C5A45F]"
+                className="w-full rounded-xl border border-emerald-800/80 bg-[#1B291F] p-2.5 text-xs text-white focus:ring-2 focus:ring-[#C5A45F]"
               />
-              <p className="text-[11px] text-[#6B6356]">
+              <p className="text-[11px] text-neutral-400">
                 O envio será registrado no WhatsApp simulado e mudará o status para{' '}
-                <strong>"Avisado"</strong>.
+                <strong className="text-white">"Avisado"</strong>.
               </p>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setWpModalHonoree(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setWpModalHonoree(null)}
+                className="border-[#2B3B30] text-neutral-300 hover:bg-[#203126]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSendManualWhatsApp}
                 disabled={isSendingWp || !wpMsg.trim()}
-                className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
               >
                 {isSendingWp ? 'Enviando...' : 'Despachar WhatsApp'}
               </Button>

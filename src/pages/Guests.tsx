@@ -268,42 +268,42 @@ export default function Guests() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <Users className="w-4 h-4" /> Gestão de Convidados
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white">
             Convidados ({guests.length})
           </h1>
-          <p className="text-sm text-[#6B6356] mt-1">
+          <p className="text-sm text-neutral-400 mt-1">
             Busca ultra-rápida, associação de mesas e controle do status de chegada.
           </p>
         </div>
 
         <Button
           onClick={openCreateDialog}
-          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-2 shadow-sm shrink-0"
+          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold gap-2 shadow-elevation shrink-0 rounded-xl"
         >
           <Plus className="w-4 h-4" /> Novo Convidado
         </Button>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm space-y-3">
+      <div className="bg-[#161412] p-4 rounded-2xl border border-[#2B2620] shadow-elevation space-y-3">
         <div className="relative">
-          <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-neutral-400" />
+          <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-neutral-500" />
           <Input
             placeholder="Pesquisar por nome do convidado, acompanhante, telefone ou homenageado..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 h-11 bg-neutral-50/50 border-neutral-200 focus:border-[#C5A45F]"
+            className="pl-10 h-11 bg-[#1C1915] border-[#332D24] text-white focus:border-[#C5A45F]"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-[#6B6356]">Status:</span>
+            <span className="text-xs font-semibold text-neutral-400">Status:</span>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 w-44 text-xs bg-white">
+              <SelectTrigger className="h-9 w-44 text-xs bg-[#1C1915] border-[#332D24] text-white">
                 <SelectValue placeholder="Todos os status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                 <SelectItem value="ALL">Todos os status</SelectItem>
                 <SelectItem value="PRESENTE">Presentes</SelectItem>
                 <SelectItem value="CONFIRMADO">Confirmados</SelectItem>
@@ -316,12 +316,12 @@ export default function Guests() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-[#6B6356]">Homenageado:</span>
+            <span className="text-xs font-semibold text-neutral-400">Homenageado:</span>
             <Select value={honoreeFilter} onValueChange={setHonoreeFilter}>
-              <SelectTrigger className="h-9 w-52 text-xs bg-white">
+              <SelectTrigger className="h-9 w-52 text-xs bg-[#1C1915] border-[#332D24] text-white">
                 <SelectValue placeholder="Todos os homenageados" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                 <SelectItem value="ALL">Todos os homenageados</SelectItem>
                 {honorees.map((h) => (
                   <SelectItem key={h.id} value={h.id}>
@@ -341,7 +341,7 @@ export default function Guests() {
                 setStatusFilter('ALL')
                 setHonoreeFilter('ALL')
               }}
-              className="text-xs text-[#6B6356] hover:text-[#1C1A17] ml-auto"
+              className="text-xs text-neutral-400 hover:text-white ml-auto"
             >
               Limpar Filtros
             </Button>
@@ -355,20 +355,20 @@ export default function Guests() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C5A45F] border-t-transparent" />
         </div>
       ) : filteredGuests.length === 0 ? (
-        <Card className="text-center py-16 bg-white border-dashed">
+        <Card className="text-center py-16 bg-[#161412] border-dashed border-[#2B2620] rounded-2xl">
           <CardContent>
-            <Users className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-[#221E1A]">Nenhum convidado encontrado.</p>
-            <p className="text-xs text-[#6B6356] mt-1">
+            <Users className="w-10 h-10 text-neutral-500 mx-auto mb-3" />
+            <p className="text-sm font-medium text-white">Nenhum convidado encontrado.</p>
+            <p className="text-xs text-neutral-400 mt-1">
               Ajuste os filtros ou cadastre um novo convidado.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm">
+        <div className="bg-[#161412] rounded-2xl border border-[#2B2620] overflow-hidden shadow-elevation">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#1C1A17] text-neutral-300 uppercase font-semibold tracking-wider text-[11px]">
+              <thead className="bg-[#141210] text-neutral-300 uppercase font-semibold tracking-wider text-[11px] border-b border-[#25201A]">
                 <tr>
                   <th className="py-3.5 px-4">Nome do Convidado</th>
                   <th className="py-3.5 px-4">Status</th>
@@ -379,7 +379,7 @@ export default function Guests() {
                   <th className="py-3.5 px-4 text-right">Ações</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-[#25201A]">
                 {filteredGuests.map((g) => {
                   const targetTable = tables.find((t) => t.id === g.table_id)
                   const targetHonoree = honorees.find((h) => h.id === g.honoree_id)
@@ -388,13 +388,13 @@ export default function Guests() {
                   return (
                     <tr
                       key={g.id}
-                      className={`hover:bg-neutral-50/80 transition-colors ${
-                        isPresent ? 'bg-emerald-50/20' : ''
+                      className={`hover:bg-[#1D1915] transition-colors ${
+                        isPresent ? 'bg-[#121E15]/50' : ''
                       }`}
                     >
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-sm text-[#1C1A17]">{g.name}</div>
-                        {g.phone && <div className="text-[11px] text-[#6B6356]">{g.phone}</div>}
+                        <div className="font-semibold text-sm text-white">{g.name}</div>
+                        {g.phone && <div className="text-[11px] text-neutral-400">{g.phone}</div>}
                       </td>
 
                       <td className="py-3.5 px-4">{getStatusBadge(g.status)}</td>
@@ -402,42 +402,42 @@ export default function Guests() {
                       <td className="py-3.5 px-4">
                         {targetTable ? (
                           <span
-                            className={`font-semibold text-xs px-2.5 py-1 rounded-md inline-block ${
+                            className={`font-semibold text-xs px-2.5 py-1 rounded-lg inline-block ${
                               targetTable.is_reserve
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : 'bg-neutral-100 text-neutral-800'
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                                : 'bg-[#24201B] text-neutral-200 border border-[#383125]'
                             }`}
                           >
                             {targetTable.name}
                           </span>
                         ) : (
-                          <span className="text-neutral-400 italic">Sem mesa</span>
+                          <span className="text-neutral-500 italic">Sem mesa</span>
                         )}
                       </td>
 
                       <td className="py-3.5 px-4">
                         {targetHonoree ? (
-                          <span className="font-medium text-[#1C1A17]">{targetHonoree.name}</span>
+                          <span className="font-medium text-neutral-200">{targetHonoree.name}</span>
                         ) : (
-                          <span className="text-neutral-400 italic">Independente</span>
+                          <span className="text-neutral-500 italic">Independente</span>
                         )}
                       </td>
 
                       <td className="py-3.5 px-4">
                         {g.accompanant ? (
-                          <span className="text-neutral-700 font-medium">{g.accompanant}</span>
+                          <span className="text-neutral-300 font-medium">{g.accompanant}</span>
                         ) : (
-                          <span className="text-neutral-400">—</span>
+                          <span className="text-neutral-500">—</span>
                         )}
                       </td>
 
                       <td className="py-3.5 px-4 max-w-xs">
                         {g.special_needs ? (
-                          <div className="text-[11px] text-amber-900 bg-amber-50 px-2 py-1 rounded border border-amber-200 inline-block line-clamp-1">
+                          <div className="text-[11px] text-amber-300 bg-amber-500/15 px-2 py-1 rounded-lg border border-amber-500/30 inline-block line-clamp-1">
                             {g.special_needs}
                           </div>
                         ) : (
-                          <span className="text-neutral-400">—</span>
+                          <span className="text-neutral-500">—</span>
                         )}
                       </td>
 
@@ -447,7 +447,7 @@ export default function Guests() {
                             <Button
                               size="sm"
                               onClick={() => handleQuickCheckin(g)}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold h-7 text-[11px] px-2.5 gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold h-7 text-[11px] px-2.5 gap-1 rounded-lg"
                             >
                               <UserCheck className="w-3.5 h-3.5" /> Presente
                             </Button>
@@ -457,7 +457,7 @@ export default function Guests() {
                             variant="ghost"
                             size="icon"
                             onClick={() => openEditDialog(g)}
-                            className="h-7 w-7 text-neutral-500 hover:text-black"
+                            className="h-7 w-7 text-neutral-400 hover:text-white"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </Button>
@@ -465,7 +465,7 @@ export default function Guests() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDelete(g.id, g.name)}
-                            className="h-7 w-7 text-neutral-400 hover:text-red-600"
+                            className="h-7 w-7 text-neutral-500 hover:text-red-400"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
@@ -482,7 +482,7 @@ export default function Guests() {
 
       {/* Guest Modal Form */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[550px] bg-white">
+        <DialogContent className="sm:max-w-[550px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle className="font-serif text-xl">
@@ -495,33 +495,44 @@ export default function Guests() {
 
             <div className="space-y-4 py-4 text-sm">
               <div className="space-y-2">
-                <Label htmlFor="g-name">Nome Completo *</Label>
+                <Label htmlFor="g-name" className="text-neutral-300">
+                  Nome Completo *
+                </Label>
                 <Input
                   id="g-name"
                   required
                   placeholder="Ex: Beatriz Souza"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="g-phone">Telefone</Label>
+                  <Label htmlFor="g-phone" className="text-neutral-300">
+                    Telefone
+                  </Label>
                   <Input
                     id="g-phone"
                     placeholder="(11) 99999-9999"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    className="bg-[#1C1915] border-[#332D24] text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="g-status">Status de Chegada</Label>
+                  <Label htmlFor="g-status" className="text-neutral-300">
+                    Status de Chegada
+                  </Label>
                   <Select value={status} onValueChange={(val: GuestStatus) => setStatus(val)}>
-                    <SelectTrigger id="g-status">
+                    <SelectTrigger
+                      id="g-status"
+                      className="bg-[#1C1915] border-[#332D24] text-white"
+                    >
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                       <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
                       <SelectItem value="PRESENTE">Presente</SelectItem>
                       <SelectItem value="PENDENTE">Pendente</SelectItem>
@@ -536,12 +547,17 @@ export default function Guests() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="g-table">Mesa Designada</Label>
+                  <Label htmlFor="g-table" className="text-neutral-300">
+                    Mesa Designada
+                  </Label>
                   <Select value={tableId} onValueChange={setTableId}>
-                    <SelectTrigger id="g-table">
+                    <SelectTrigger
+                      id="g-table"
+                      className="bg-[#1C1915] border-[#332D24] text-white"
+                    >
                       <SelectValue placeholder="Selecione a mesa" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                       <SelectItem value="">Nenhuma Mesa</SelectItem>
                       {tables.map((t) => (
                         <SelectItem key={t.id} value={t.id}>
@@ -553,12 +569,17 @@ export default function Guests() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="g-honoree">Homenageado Vinculado</Label>
+                  <Label htmlFor="g-honoree" className="text-neutral-300">
+                    Homenageado Vinculado
+                  </Label>
                   <Select value={honoreeId} onValueChange={setHonoreeId}>
-                    <SelectTrigger id="g-honoree">
+                    <SelectTrigger
+                      id="g-honoree"
+                      className="bg-[#1C1915] border-[#332D24] text-white"
+                    >
                       <SelectValue placeholder="Vincular a homenageado" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                       <SelectItem value="">Nenhum (Independente)</SelectItem>
                       {honorees.map((h) => (
                         <SelectItem key={h.id} value={h.id}>
@@ -571,17 +592,20 @@ export default function Guests() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="g-accomp">Acompanhante (Nome/Parentesco)</Label>
+                <Label htmlFor="g-accomp" className="text-neutral-300">
+                  Acompanhante (Nome/Parentesco)
+                </Label>
                 <Input
                   id="g-accomp"
                   placeholder="Ex: Esposo / Filha"
                   value={accompanant}
                   onChange={(e) => setAccompanant(e.target.value)}
+                  className="bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="g-needs" className="text-amber-900 font-semibold">
+                <Label htmlFor="g-needs" className="text-amber-300 font-semibold">
                   Necessidades Especiais (Alergias / Acessibilidade)
                 </Label>
                 <Input
@@ -589,17 +613,21 @@ export default function Guests() {
                   placeholder="Ex: Cadeira de rodas / Cardápio sem glúten"
                   value={specialNeeds}
                   onChange={(e) => setSpecialNeeds(e.target.value)}
+                  className="bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="g-obs">Observações Gerais</Label>
+                <Label htmlFor="g-obs" className="text-neutral-300">
+                  Observações Gerais
+                </Label>
                 <Textarea
                   id="g-obs"
                   rows={2}
                   placeholder="Ex: Confirmou presença pelo WhatsApp."
                   value={observations}
                   onChange={(e) => setObservations(e.target.value)}
+                  className="bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
             </div>
@@ -610,13 +638,14 @@ export default function Guests() {
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSubmitting}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#201D18]"
               >
                 Cancelar
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl"
               >
                 {isSubmitting ? 'Salvando...' : 'Salvar Convidado'}
               </Button>

@@ -367,10 +367,10 @@ export default function Live() {
               Visão por Função Ativa:
             </span>
             <Select value={currentRole} onValueChange={(v) => setCurrentRole(v as OperationalRole)}>
-              <SelectTrigger className="w-full sm:w-[280px] h-10 bg-white border-2 border-[#C5A45F] text-xs font-bold text-[#1C1A17]">
+              <SelectTrigger className="w-full sm:w-[280px] h-10 bg-[#1C1915] border border-[#3D3528] text-xs font-bold text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#1C1813] border-[#383125] text-white">
                 {Object.entries(ROLE_CONFIGS).map(([k, cfg]) => (
                   <SelectItem key={k} value={k}>
                     {cfg.label}
@@ -382,7 +382,7 @@ export default function Live() {
 
           <Button
             onClick={() => setIsBroadcastOpen(true)}
-            className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-bold text-xs h-10 gap-1.5 border border-[#3D3833] shadow"
+            className="bg-[#1C1915] hover:bg-[#28231D] text-[#C5A45F] font-bold text-xs h-10 gap-1.5 border border-[#3D3528] shadow-elevation rounded-xl"
           >
             <Send className="w-4 h-4" /> Disparar WhatsApp Geral
           </Button>
@@ -390,13 +390,14 @@ export default function Live() {
       </div>
 
       {/* Role Context Chip */}
-      <div className="bg-[#1C1A17] text-white p-3 rounded-xl border border-[#332E27] flex items-center justify-between text-xs">
+      <div className="bg-[#161412] text-white p-3 rounded-2xl border border-[#2B2620] flex items-center justify-between text-xs shadow-elevation">
         <div className="flex items-center gap-2">
           <Badge className={ROLE_CONFIGS[currentRole].badge}>
             {ROLE_CONFIGS[currentRole].label}
           </Badge>
-          <span className="text-neutral-300">
-            Foco Operacional: <strong>{ROLE_CONFIGS[currentRole].focus}</strong>
+          <span className="text-neutral-400">
+            Foco Operacional:{' '}
+            <strong className="text-neutral-200">{ROLE_CONFIGS[currentRole].focus}</strong>
           </span>
         </div>
         <span className="text-[11px] text-[#C5A45F] font-semibold hidden sm:inline">
@@ -407,36 +408,36 @@ export default function Live() {
       {/* THREE PILLAR PANELS: TIMELINE / HONOREES / BUFFET */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Pillar 1: Programação Atual & Próxima Atividade */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm flex flex-col justify-between">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100">
+        <Card className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation flex flex-col justify-between rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A]">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                 CRONOGRAMA DO PALCO
               </span>
-              <Badge className="bg-emerald-600 text-white text-[10px] font-bold animate-pulse">
+              <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold animate-pulse">
                 EM ANDAMENTO
               </Badge>
             </div>
-            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] mt-1">
+            <CardTitle className="text-base font-serif font-bold text-white mt-1">
               {currentTimelineItem ? currentTimelineItem.title : 'Recepção dos Convidados'}
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs text-neutral-400">
               Horário previsto: {currentTimelineItem?.scheduled_time || '19:00'} • Responsável:{' '}
               {currentTimelineItem?.responsibles || 'Hugo Cerimonial'}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 space-y-3">
-            <p className="text-xs text-neutral-600 bg-neutral-50 p-2.5 rounded-xl border border-neutral-200">
+            <p className="text-xs text-neutral-300 bg-[#1C1813] p-3 rounded-xl border border-[#2B2620]">
               {currentTimelineItem?.description ||
                 'Entrada musical, recepção com espumante no foyer e direcionamento às 20 mesas.'}
             </p>
 
             {nextTimelineItem && (
-              <div className="pt-2 border-t border-neutral-100">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356] block">
+              <div className="pt-2 border-t border-[#25201A]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
                   PRÓXIMA ATIVIDADE PROGRAMADA:
                 </span>
-                <div className="font-serif font-bold text-sm text-[#1C1A17] mt-0.5">
+                <div className="font-serif font-bold text-sm text-white mt-0.5">
                   {nextTimelineItem.title} ({nextTimelineItem.scheduled_time})
                 </div>
               </div>
@@ -444,7 +445,10 @@ export default function Live() {
           </CardContent>
           <div className="p-4 pt-0">
             <Link to={`/events/${eventId}/timeline`}>
-              <Button variant="outline" className="w-full text-xs h-8 border-neutral-300">
+              <Button
+                variant="outline"
+                className="w-full text-xs h-8 border-[#332D24] text-neutral-300 hover:bg-[#201D18] rounded-xl"
+              >
                 Abrir Roteiro Completo do Cerimonial
               </Button>
             </Link>
@@ -452,43 +456,43 @@ export default function Live() {
         </Card>
 
         {/* Pillar 2: Próximos Homenageados */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm flex flex-col justify-between">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100">
+        <Card className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation flex flex-col justify-between rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A]">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                 HOMENAGEADOS EM DESTAQUE
               </span>
-              <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold">
+              <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#383125] text-[10px] font-bold">
                 30 Homenagens
               </Badge>
             </div>
-            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] mt-1 flex items-center gap-1.5">
+            <CardTitle className="text-base font-serif font-bold text-white mt-1 flex items-center gap-1.5">
               <Award className="w-4 h-4 text-[#C5A45F]" />
               {onStageHonoree ? `No Palco: ${onStageHonoree.name}` : 'Preparando Palco'}
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs text-neutral-400">
               {onStageHonoree
                 ? `Ordem #${onStageHonoree.tribute_order} • Acompanhante: ${onStageHonoree.escort_name || 'Sim'}`
                 : 'Cerimônia de premiação prestes a iniciar'}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356] block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
               Próximos na Fila de Chamada:
             </span>
             <div className="space-y-1.5">
               {upcomingHonorees.map((uh) => (
                 <div
                   key={uh.id}
-                  className="flex items-center justify-between p-2 rounded-lg bg-neutral-50 border border-neutral-200 text-xs"
+                  className="flex items-center justify-between p-2 rounded-xl bg-[#1C1813] border border-[#2B2620] text-xs"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-[#24201B] text-[#C5A45F] border border-[#383125] text-[10px] font-bold flex items-center justify-center">
                       {uh.tribute_order}
                     </span>
-                    <span className="font-semibold text-[#1C1A17]">{uh.name}</span>
+                    <span className="font-semibold text-white">{uh.name}</span>
                   </div>
-                  <Badge className="text-[9px] bg-neutral-200 text-neutral-800">
+                  <Badge className="text-[9px] bg-[#24201B] text-neutral-300 border border-[#383125]">
                     {uh.operational_state || 'AGUARDANDO'}
                   </Badge>
                 </div>
@@ -497,7 +501,10 @@ export default function Live() {
           </CardContent>
           <div className="p-4 pt-0">
             <Link to={`/events/${eventId}/honorees`}>
-              <Button variant="outline" className="w-full text-xs h-8 border-neutral-300">
+              <Button
+                variant="outline"
+                className="w-full text-xs h-8 border-[#332D24] text-neutral-300 hover:bg-[#201D18] rounded-xl"
+              >
                 Gerenciar Painel dos 30 Homenageados
               </Button>
             </Link>
@@ -505,44 +512,44 @@ export default function Live() {
         </Card>
 
         {/* Pillar 3: Liberação do Buffet */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm flex flex-col justify-between">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100">
+        <Card className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation flex flex-col justify-between rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A]">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                 BUFFET GASTRONÔMICO
               </span>
-              <Badge className="bg-indigo-100 text-indigo-900 border-indigo-300 text-[10px] font-bold">
+              <Badge className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold">
                 Ondas de 2-3 Mesas
               </Badge>
             </div>
-            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] mt-1 flex items-center gap-1.5">
+            <CardTitle className="text-base font-serif font-bold text-white mt-1 flex items-center gap-1.5">
               <Utensils className="w-4 h-4 text-[#C5A45F]" />
               {latestWave
                 ? `Última Onda: ${latestWave.table_names}`
                 : 'Aguardando Início do Buffet'}
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs text-neutral-400">
               {latestWave
                 ? `Liberado às ${new Date(latestWave.released_at).toLocaleTimeString('pt-BR')} por ${latestWave.operator}`
                 : 'Programado para 20:30'}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 space-y-2 text-xs">
-            <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
-              <span className="font-semibold text-neutral-800 block">Status no Telão LED:</span>
-              <span className="text-emerald-700 font-bold">
+            <div className="p-3 bg-[#1C1813] rounded-xl border border-[#2B2620]">
+              <span className="font-semibold text-neutral-300 block">Status no Telão LED:</span>
+              <span className="text-emerald-400 font-bold">
                 {latestWave?.display_on_screen
                   ? '✓ Projetando no Telão Principal'
                   : 'Aguardando ativação'}
               </span>
             </div>
-            <div className="text-[11px] text-neutral-500">
+            <div className="text-[11px] text-neutral-400">
               WhatsApp automático despachado em lote para os convidados das mesas chamadas.
             </div>
           </CardContent>
           <div className="p-4 pt-0">
             <Link to={`/events/${eventId}/buffet`}>
-              <Button className="w-full text-xs h-8 bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold">
+              <Button className="w-full text-xs h-8 bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl">
                 Liberar Próxima Onda de Mesas
               </Button>
             </Link>
@@ -553,21 +560,21 @@ export default function Live() {
       {/* OCORRÊNCIAS EM TEMPO REAL & HISTÓRICO DE AUDITORIA (Requirement K & M) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Ocorrências com resolução */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+        <Card className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A] flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-base font-serif font-bold text-[#1C1A17] flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <CardTitle className="text-base font-serif font-bold text-white flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
                 Ocorrências de Salão & Resoluções
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-neutral-400">
                 Registre imprevistos com setor, responsável e solução tomada
               </CardDescription>
             </div>
             <Button
               size="sm"
               onClick={() => setIsNewOccOpen(true)}
-              className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-bold text-xs h-8 gap-1"
+              className="bg-[#24201B] hover:bg-[#322C25] text-[#C5A45F] border border-[#3D3528] font-bold text-xs h-8 gap-1 rounded-xl"
             >
               <Plus className="w-3.5 h-3.5" /> Registrar Ocorrência
             </Button>
@@ -579,30 +586,28 @@ export default function Live() {
               return (
                 <div
                   key={occ.id}
-                  className={`p-3.5 rounded-xl border-2 transition-all space-y-2 ${
-                    isResolved
-                      ? 'border-neutral-200 bg-neutral-50/70'
-                      : 'border-red-400 bg-red-50/20'
+                  className={`p-3.5 rounded-2xl border transition-all space-y-2 ${
+                    isResolved ? 'border-[#2B2620] bg-[#1C1813]' : 'border-red-600/60 bg-[#211111]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[9px]">
+                        <Badge className="bg-[#24201B] text-[#C5A45F] border border-[#383125] text-[9px]">
                           {occ.category}
                         </Badge>
-                        <span className="text-xs font-bold text-[#1C1A17]">{occ.description}</span>
+                        <span className="text-xs font-bold text-white">{occ.description}</span>
                       </div>
-                      <div className="text-[11px] text-neutral-500 mt-1">
-                        Responsável: <strong>{occ.responsible}</strong>
+                      <div className="text-[11px] text-neutral-400 mt-1">
+                        Responsável: <strong className="text-neutral-200">{occ.responsible}</strong>
                       </div>
                     </div>
 
                     <Badge
                       className={`text-[9px] font-bold shrink-0 ${
                         isResolved
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-red-600 text-white animate-pulse'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'
                       }`}
                     >
                       {isResolved ? 'RESOLVIDA' : 'PENDENTE'}
@@ -610,7 +615,7 @@ export default function Live() {
                   </div>
 
                   {isResolved ? (
-                    <div className="text-xs text-emerald-800 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
+                    <div className="text-xs text-emerald-300 bg-emerald-950/40 p-2 rounded-xl border border-emerald-800/60">
                       <strong>Solução Adotada:</strong> {occ.solution}
                     </div>
                   ) : (
@@ -621,7 +626,7 @@ export default function Live() {
                           setResolvingOcc(occ)
                           setSolutionText('')
                         }}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-7 px-3"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-7 px-3 rounded-lg"
                       >
                         ✓ Registrar Solução
                       </Button>
@@ -634,18 +639,18 @@ export default function Live() {
         </Card>
 
         {/* Audit Log / Histórico de Auditoria */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
-          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+        <Card className="bg-[#161412] text-white border border-[#2B2620] shadow-elevation rounded-2xl">
+          <CardHeader className="p-4 pb-2 border-b border-[#25201A] flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-base font-serif font-bold text-[#1C1A17] flex items-center gap-2">
+              <CardTitle className="text-base font-serif font-bold text-white flex items-center gap-2">
                 <History className="w-4 h-4 text-[#C5A45F]" />
                 Histórico de Auditoria Operacional
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-neutral-400">
                 Rastreamento completo: quem executou, horário, ação e entidade alvo
               </CardDescription>
             </div>
-            <Badge className="bg-neutral-100 text-neutral-800 text-[10px]">
+            <Badge className="bg-[#24201B] text-neutral-300 border border-[#383125] text-[10px]">
               {auditLogs.length} registros
             </Badge>
           </CardHeader>
@@ -653,16 +658,16 @@ export default function Live() {
             {auditLogs.map((log) => (
               <div
                 key={log.id}
-                className="p-2.5 rounded-lg bg-neutral-50 border border-neutral-200 space-y-1"
+                className="p-2.5 rounded-xl bg-[#1C1813] border border-[#2B2620] space-y-1"
               >
                 <div className="flex items-center justify-between text-[11px]">
-                  <strong className="text-[#1C1A17]">{log.actor_name}</strong>
-                  <span className="text-neutral-400">
+                  <strong className="text-white">{log.actor_name}</strong>
+                  <span className="text-neutral-500">
                     {log.timestamp ? new Date(log.timestamp).toLocaleTimeString('pt-BR') : 'Agora'}
                   </span>
                 </div>
                 <div className="text-[#C5A45F] font-bold text-[10px]">{log.action}</div>
-                <div className="text-neutral-600 text-[11px] font-sans">{log.details}</div>
+                <div className="text-neutral-400 text-[11px] font-sans">{log.details}</div>
               </div>
             ))}
           </CardContent>
@@ -671,7 +676,7 @@ export default function Live() {
 
       {/* NEW OCCURRENCE MODAL */}
       <Dialog open={isNewOccOpen} onOpenChange={setIsNewOccOpen}>
-        <DialogContent className="sm:max-w-[480px] bg-white">
+        <DialogContent className="sm:max-w-[480px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
           <form onSubmit={handleCreateOccurrence}>
             <DialogHeader>
               <DialogTitle className="font-serif text-xl flex items-center gap-2 text-amber-900">
@@ -757,7 +762,7 @@ export default function Live() {
       {/* RESOLVE OCCURRENCE MODAL */}
       {resolvingOcc && (
         <Dialog open={!!resolvingOcc} onOpenChange={(open) => !open && setResolvingOcc(null)}>
-          <DialogContent className="sm:max-w-[480px] bg-white">
+          <DialogContent className="sm:max-w-[480px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
             <DialogHeader>
               <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-900">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" /> Registrar Solução da
@@ -797,7 +802,7 @@ export default function Live() {
 
       {/* BROADCAST WHATSAPP MODAL */}
       <Dialog open={isBroadcastOpen} onOpenChange={setIsBroadcastOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white border-2 border-emerald-500">
+        <DialogContent className="sm:max-w-[500px] bg-[#141E17] text-white border border-emerald-500/60 rounded-2xl shadow-2xl">
           <DialogHeader>
             <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-2">
               <Send className="w-6 h-6" />

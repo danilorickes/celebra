@@ -327,10 +327,10 @@ export default function Timeline() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <Clock className="w-4 h-4" /> Roteiro Operacional
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white">
             Protocolo & Linha do Tempo
           </h1>
-          <p className="text-sm text-[#6B6356] mt-1">
+          <p className="text-sm text-neutral-400 mt-1">
             Ordem cronológica precisa, controle de atrasos em minutos e disparo de alertas
             segmentados por equipe.
           </p>
@@ -338,7 +338,7 @@ export default function Timeline() {
 
         <Button
           onClick={openCreateDialog}
-          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-2 shadow-sm shrink-0"
+          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold gap-2 shadow-elevation shrink-0 rounded-xl"
         >
           <Plus className="w-4 h-4" /> Novo Momento
         </Button>
@@ -350,12 +350,10 @@ export default function Timeline() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C5A45F] border-t-transparent" />
         </div>
       ) : items.length === 0 ? (
-        <Card className="text-center py-16 bg-white border-dashed">
+        <Card className="text-center py-16 bg-[#161412] border-dashed border-[#2B2620] rounded-2xl">
           <CardContent>
-            <Clock className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-[#221E1A]">
-              Nenhum momento cadastrado no roteiro.
-            </p>
+            <Clock className="w-10 h-10 text-neutral-500 mx-auto mb-3" />
+            <p className="text-sm font-medium text-white">Nenhum momento cadastrado no roteiro.</p>
           </CardContent>
         </Card>
       ) : (
@@ -379,18 +377,18 @@ export default function Timeline() {
                 <div
                   className={`absolute -left-[31px] sm:-left-[39px] top-4 w-5 h-5 rounded-full border-4 transition-all ${
                     isCurrent
-                      ? 'bg-emerald-600 border-white ring-4 ring-emerald-500/30'
+                      ? 'bg-emerald-500 border-[#121E15] ring-4 ring-emerald-500/30'
                       : item.status === 'CONCLUIDO'
-                        ? 'bg-neutral-400 border-white'
-                        : 'bg-[#C5A45F] border-[#1C1A17]'
+                        ? 'bg-neutral-600 border-[#141210]'
+                        : 'bg-[#C5A45F] border-[#141210]'
                   }`}
                 />
 
                 <Card
-                  className={`transition-all shadow-sm ${
+                  className={`transition-all shadow-elevation rounded-2xl ${
                     isCurrent
-                      ? 'border-2 border-emerald-500 bg-emerald-50/10 shadow-md'
-                      : 'border-neutral-200 bg-white hover:border-[#C5A45F]'
+                      ? 'border border-emerald-500 bg-[#121F16]'
+                      : 'border border-[#2B2620] bg-[#161412] hover:border-[#C5A45F]'
                   }`}
                 >
                   <CardContent className="p-5 sm:p-6 space-y-3">
@@ -402,18 +400,18 @@ export default function Timeline() {
                           </span>
                           {getStatusBadge(item.status, item.delay_minutes)}
                           {item.delay_minutes > 0 && item.status !== 'ATRASADO' && (
-                            <span className="text-xs text-red-600 font-semibold">
+                            <span className="text-xs text-red-400 font-semibold">
                               (+{item.delay_minutes}m atraso)
                             </span>
                           )}
                         </div>
 
-                        <h3 className="font-serif font-bold text-lg sm:text-xl text-[#1C1A17] mt-1">
+                        <h3 className="font-serif font-bold text-lg sm:text-xl text-white mt-1">
                           {item.title}
                         </h3>
 
                         {item.description && (
-                          <p className="text-xs sm:text-sm text-[#6B6356] mt-1 leading-relaxed">
+                          <p className="text-xs sm:text-sm text-neutral-400 mt-1 leading-relaxed">
                             {item.description}
                           </p>
                         )}
@@ -425,7 +423,7 @@ export default function Timeline() {
                           <Button
                             size="sm"
                             onClick={() => handleStart(item)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs h-8 gap-1.5"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs h-8 gap-1.5 rounded-xl"
                           >
                             <Play className="w-3.5 h-3.5 fill-current" /> Iniciar
                           </Button>
@@ -435,7 +433,7 @@ export default function Timeline() {
                           <Button
                             size="sm"
                             onClick={() => handleComplete(item)}
-                            className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-semibold text-xs h-8 gap-1.5"
+                            className="bg-[#24201B] hover:bg-[#322C25] text-[#C5A45F] border border-[#3D3528] font-semibold text-xs h-8 gap-1.5 rounded-xl"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" /> Concluir
                           </Button>
@@ -448,7 +446,7 @@ export default function Timeline() {
                             setDelayItem(item)
                             setDelayInput(10)
                           }}
-                          className="text-xs h-8 border-red-200 text-red-700 hover:bg-red-50 gap-1"
+                          className="text-xs h-8 border-red-800/80 text-red-300 bg-[#261515] hover:bg-[#331C1C] gap-1 rounded-xl"
                         >
                           <AlertTriangle className="w-3.5 h-3.5" /> Atrasar
                         </Button>
@@ -462,7 +460,7 @@ export default function Timeline() {
                               `ATENÇÃO: Momento "${item.title}" em preparação. Equipes atenção!`,
                             )
                           }}
-                          className="text-xs h-8 border-[#C5A45F]/50 text-[#C5A45F] hover:bg-amber-50/50 gap-1"
+                          className="text-xs h-8 border-[#3D3528] text-[#C5A45F] bg-[#1C1813] hover:bg-[#25201A] gap-1 rounded-xl"
                         >
                           <BellRing className="w-3.5 h-3.5" /> Avisar Equipes
                         </Button>
@@ -471,7 +469,7 @@ export default function Timeline() {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEditDialog(item)}
-                          className="h-8 w-8 text-neutral-400 hover:text-black"
+                          className="h-8 w-8 text-neutral-400 hover:text-white"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </Button>
@@ -479,7 +477,7 @@ export default function Timeline() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(item.id, item.title)}
-                          className="h-8 w-8 text-neutral-400 hover:text-red-600"
+                          className="h-8 w-8 text-neutral-500 hover:text-red-400"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
@@ -487,35 +485,35 @@ export default function Timeline() {
                     </div>
 
                     {/* Metadata & Team chips */}
-                    <div className="pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="pt-2 border-t border-[#25201A] flex flex-wrap items-center justify-between gap-2 text-xs">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-[#6B6356] font-medium mr-1">Equipes:</span>
+                        <span className="text-neutral-400 font-medium mr-1">Equipes:</span>
                         {associatedTeams.length > 0 ? (
                           associatedTeams.map((team) => (
                             <Badge
                               key={team.id}
                               variant="outline"
-                              className="bg-neutral-50 text-neutral-800 border-neutral-200 text-[10px]"
+                              className="bg-[#1C1915] text-neutral-200 border-[#2B2620] text-[10px]"
                             >
                               {team.name}
                             </Badge>
                           ))
                         ) : (
-                          <span className="text-neutral-400 italic">Geral / Cerimonial</span>
+                          <span className="text-neutral-500 italic">Geral / Cerimonial</span>
                         )}
                       </div>
 
                       {item.responsibles && (
-                        <div className="text-neutral-600">
-                          <span className="font-semibold text-neutral-400">Responsável:</span>{' '}
-                          {item.responsibles}
+                        <div className="text-neutral-400">
+                          <span className="font-semibold text-neutral-500">Responsável:</span>{' '}
+                          <span className="text-neutral-200">{item.responsibles}</span>
                         </div>
                       )}
                     </div>
 
                     {item.observations && (
-                      <div className="text-[11px] text-[#6B6356] bg-neutral-50 p-2 rounded-lg border border-neutral-100">
-                        <strong>Obs:</strong> {item.observations}
+                      <div className="text-[11px] text-neutral-300 bg-[#1C1813] p-2.5 rounded-xl border border-[#2B2620]">
+                        <strong className="text-white">Obs:</strong> {item.observations}
                       </div>
                     )}
                   </CardContent>
@@ -529,12 +527,12 @@ export default function Timeline() {
       {/* Delay Modal with Recalculation Option */}
       {delayItem && (
         <Dialog open={!!delayItem} onOpenChange={(open) => !open && setDelayItem(null)}>
-          <DialogContent className="sm:max-w-[440px] bg-white">
+          <DialogContent className="sm:max-w-[440px] bg-[#1A1111] text-white border border-red-700/80 rounded-2xl shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl text-red-900 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-600" /> Registrar Atraso
+              <DialogTitle className="font-serif text-xl text-red-300 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-400" /> Registrar Atraso
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-neutral-400 text-xs">
                 Informe quantos minutos este momento atrasou. Você pode recalcular a programação dos
                 próximos momentos automaticamente.
               </DialogDescription>
@@ -542,7 +540,9 @@ export default function Timeline() {
 
             <div className="space-y-4 py-3 text-sm">
               <div className="space-y-2">
-                <Label htmlFor="delay-mins">Minutos de atraso:</Label>
+                <Label htmlFor="delay-mins" className="text-neutral-300">
+                  Minutos de atraso:
+                </Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="delay-mins"
@@ -551,7 +551,7 @@ export default function Timeline() {
                     max={120}
                     value={delayInput}
                     onChange={(e) => setDelayInput(parseInt(e.target.value) || 0)}
-                    className="h-11 font-bold text-lg"
+                    className="h-11 font-bold text-lg bg-[#241717] border-red-800 text-white"
                   />
                   <div className="flex gap-1">
                     {[5, 10, 15, 20].map((m) => (
@@ -561,7 +561,7 @@ export default function Timeline() {
                         variant="outline"
                         size="sm"
                         onClick={() => setDelayInput(m)}
-                        className="text-xs h-11"
+                        className="text-xs h-11 border-red-800 text-red-300 bg-[#241717] hover:bg-[#321F1F]"
                       >
                         +{m}m
                       </Button>
@@ -570,28 +570,33 @@ export default function Timeline() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 pt-2 border-t border-neutral-100">
+              <div className="flex items-start gap-2 pt-2 border-t border-red-900/60">
                 <input
                   type="checkbox"
                   id="recalc-next"
                   checked={recalcNext}
                   onChange={(e) => setRecalcNext(e.target.checked)}
-                  className="mt-1 rounded text-[#C5A45F] focus:ring-[#C5A45F]"
+                  className="mt-1 rounded text-[#C5A45F] focus:ring-[#C5A45F] bg-[#12100E] border-red-800"
                 />
-                <label htmlFor="recalc-next" className="text-xs text-[#221E1A] cursor-pointer">
-                  <strong>Recalcular automaticamente</strong> os horários dos momentos seguintes (+
+                <label htmlFor="recalc-next" className="text-xs text-neutral-300 cursor-pointer">
+                  <strong className="text-white">Recalcular automaticamente</strong> os horários dos
+                  momentos seguintes (+
                   {delayInput} minutos na timeline).
                 </label>
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDelayItem(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setDelayItem(null)}
+                className="border-[#382626] text-neutral-300 hover:bg-[#2B1B1B]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={handleApplyDelay}
-                className="bg-red-700 hover:bg-red-800 text-white font-semibold"
+                className="bg-red-700 hover:bg-red-800 text-white font-semibold rounded-xl"
               >
                 Aplicar Atraso
               </Button>
@@ -603,12 +608,12 @@ export default function Timeline() {
       {/* Broadcast Alert Modal */}
       {alertTargetItem && (
         <Dialog open={!!alertTargetItem} onOpenChange={(open) => !open && setAlertTargetItem(null)}>
-          <DialogContent className="sm:max-w-[480px] bg-white">
+          <DialogContent className="sm:max-w-[480px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl flex items-center gap-2">
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-white">
                 <BellRing className="w-5 h-5 text-[#C5A45F]" /> Enviar Alerta Operacional
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-neutral-400 text-xs">
                 Dispare uma ordem/alerta segmentada diretamente para as equipes envolvidas neste
                 momento.
               </DialogDescription>
@@ -616,27 +621,30 @@ export default function Timeline() {
 
             <div className="space-y-3 py-3 text-sm">
               <div>
-                <span className="text-xs uppercase font-semibold text-[#6B6356] block">
+                <span className="text-xs uppercase font-semibold text-neutral-400 block">
                   Momento do Protocolo:
                 </span>
-                <span className="font-serif font-bold text-base text-[#1C1A17]">
+                <span className="font-serif font-bold text-base text-white">
                   {alertTargetItem.title}
                 </span>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="custom-alert-msg">Mensagem para as Equipes:</Label>
+                <Label htmlFor="custom-alert-msg" className="text-neutral-300">
+                  Mensagem para as Equipes:
+                </Label>
                 <Textarea
                   id="custom-alert-msg"
                   rows={3}
                   value={customAlertMsg}
                   onChange={(e) => setCustomAlertMsg(e.target.value)}
                   placeholder="Ex: Homenagem em 10 minutos. Som e foto atentos ao palco!"
+                  className="bg-[#1C1915] border-[#332D24] text-white"
                 />
               </div>
 
-              <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200 text-xs text-[#6B6356]">
-                <strong className="text-[#1C1A17]">Destinatários:</strong>{' '}
+              <div className="bg-[#1C1915] p-3 rounded-xl border border-[#2B2620] text-xs text-neutral-400">
+                <strong className="text-white">Destinatários:</strong>{' '}
                 {alertTargetItem.teams?.length
                   ? teams
                       .filter((t) => alertTargetItem.teams.includes(t.id))
@@ -647,13 +655,17 @@ export default function Timeline() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setAlertTargetItem(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setAlertTargetItem(null)}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#201D18]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSendAlert}
                 disabled={isSendingAlert}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-1.5"
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold gap-1.5 rounded-xl"
               >
                 {isSendingAlert ? 'Disparando...' : 'Disparar Alerta'}
               </Button>
@@ -664,7 +676,7 @@ export default function Timeline() {
 
       {/* Create / Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[550px] bg-white">
+        <DialogContent className="sm:max-w-[550px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle className="font-serif text-xl">

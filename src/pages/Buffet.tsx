@@ -233,10 +233,10 @@ export default function Buffet() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <Utensils className="w-4 h-4" /> Gestão Gastronômica & Fluxo do Salão
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-white tracking-tight">
             Liberação das Mesas & Restrições Alimentares
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+          <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
             Liberação em ondas de 2-3 mesas para evitar filas, integração com telão, WhatsApp
             simulado e controle estrito de pratos especiais.
           </p>
@@ -245,7 +245,7 @@ export default function Buffet() {
         <div className="flex items-center gap-2">
           <Button
             onClick={() => setIsScreenModalOpen(true)}
-            className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] border border-[#3D3833] font-bold text-xs h-10 gap-2 shadow"
+            className="bg-[#1C1915] hover:bg-[#28231D] text-[#C5A45F] border border-[#3D3425] font-bold text-xs h-10 gap-2 shadow-elevation rounded-xl"
           >
             <Tv className="w-4 h-4 text-[#C5A45F]" /> Modo Telão LED do Salão
           </Button>
@@ -253,20 +253,20 @@ export default function Buffet() {
       </div>
 
       {/* SECTION 1: LIBERAÇÃO DE MESAS EM ONDAS (Requirement G) */}
-      <Card className="border-2 border-neutral-200 bg-white shadow-sm overflow-hidden">
-        <CardHeader className="bg-[#FBFBFA] border-b border-neutral-100 p-4 sm:p-5">
+      <Card className="border border-[#2B2620] bg-[#161412] text-white shadow-elevation rounded-2xl overflow-hidden">
+        <CardHeader className="bg-[#191613] border-b border-[#25201A] p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <CardTitle className="text-lg font-serif font-bold text-[#1C1A17] flex items-center gap-2">
+              <CardTitle className="text-lg font-serif font-bold text-white flex items-center gap-2">
                 <Flame className="w-5 h-5 text-[#C5A45F]" />
                 Painel de Liberação do Buffet em Ondas
               </CardTitle>
-              <CardDescription className="text-xs text-[#6B6356]">
+              <CardDescription className="text-xs text-neutral-400">
                 Selecione até 3 mesas por onda para manter o réchaud fluido e abastecido.
               </CardDescription>
             </div>
             {latestRelease && (
-              <Badge className="bg-indigo-100 text-indigo-900 border-indigo-300 font-bold self-start sm:self-auto">
+              <Badge className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold self-start sm:self-auto">
                 Última Onda #{latestRelease.wave_number}: {latestRelease.table_names}
               </Badge>
             )}
@@ -352,7 +352,7 @@ export default function Buffet() {
 
           {/* Grid of Tables by State */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-[#6B6356]">
+            <div className="flex items-center justify-between text-xs text-neutral-400">
               <span className="font-semibold uppercase tracking-wider">
                 Status das Mesas no Buffet (Clique para alternar seleção)
               </span>
@@ -374,34 +374,34 @@ export default function Buffet() {
                     <div
                       key={table.id}
                       onClick={() => !isCalled && !isDone && toggleTableSelection(table.id)}
-                      className={`p-3 rounded-xl border-2 transition-all cursor-pointer relative ${
+                      className={`p-3 rounded-2xl border transition-all cursor-pointer relative ${
                         isSelected
-                          ? 'border-[#C5A45F] bg-[#C5A45F]/10 shadow-md ring-2 ring-[#C5A45F]'
+                          ? 'border-[#C5A45F] bg-[#C5A45F]/15 shadow-md ring-2 ring-[#C5A45F]'
                           : isCalled
-                            ? 'border-indigo-500 bg-indigo-50/40'
+                            ? 'border-indigo-500 bg-indigo-950/40'
                             : isDone
-                              ? 'border-neutral-300 bg-neutral-100 opacity-60 cursor-not-allowed'
-                              : 'border-neutral-200 bg-white hover:border-[#C5A45F]'
+                              ? 'border-[#26221C] bg-[#141210] opacity-50 cursor-not-allowed'
+                              : 'border-[#2B2620] bg-[#181512] hover:border-[#C5A45F]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-serif font-bold text-sm text-[#1C1A17]">
+                        <span className="font-serif font-bold text-sm text-white">
                           {table.name}
                         </span>
                         {isSelected && <span className="w-2.5 h-2.5 rounded-full bg-[#C5A45F]" />}
                       </div>
 
-                      <div className="text-[11px] text-[#6B6356]">{table.capacity} lugares</div>
+                      <div className="text-[11px] text-neutral-400">{table.capacity} lugares</div>
 
                       <Badge
                         className={`mt-2 text-[9px] w-full justify-center ${
                           isCalled
                             ? 'bg-indigo-600 text-white animate-pulse'
                             : isAttended
-                              ? 'bg-amber-100 text-amber-900'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                               : isDone
-                                ? 'bg-neutral-800 text-white'
-                                : 'bg-neutral-100 text-neutral-700'
+                                ? 'bg-neutral-800 text-neutral-300'
+                                : 'bg-[#24201B] text-neutral-300 border border-[#383125]'
                         }`}
                       >
                         {table.buffet_status || 'AGUARDANDO'}
@@ -409,13 +409,13 @@ export default function Buffet() {
 
                       {/* State stepper quick control if called */}
                       {isCalled && (
-                        <div className="mt-2 pt-1 border-t border-indigo-200 flex justify-between gap-1">
+                        <div className="mt-2 pt-1 border-t border-indigo-500/30 flex justify-between gap-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
                               handleAdvanceTableStatus(table.id, 'CONCLUIDA')
                             }}
-                            className="text-[9px] text-indigo-900 font-bold hover:underline"
+                            className="text-[9px] text-indigo-300 font-bold hover:underline"
                           >
                             ✓ Concluir
                           </button>
@@ -430,20 +430,20 @@ export default function Buffet() {
       </Card>
 
       {/* SECTION 2: PAINEL DE RESTRIÇÕES ALIMENTARES (Requirement F) */}
-      <Card className="border-2 border-amber-300 bg-white shadow-sm overflow-hidden">
-        <CardHeader className="bg-amber-50/50 border-b border-amber-200 p-4 sm:p-5">
+      <Card className="border border-amber-600/40 bg-[#161412] text-white shadow-elevation rounded-2xl overflow-hidden">
+        <CardHeader className="bg-[#1C1813] border-b border-[#292218] p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <CardTitle className="text-lg font-serif font-bold text-amber-950 flex items-center gap-2">
-                <ChefHat className="w-5 h-5 text-amber-700" />
+              <CardTitle className="text-lg font-serif font-bold text-amber-300 flex items-center gap-2">
+                <ChefHat className="w-5 h-5 text-amber-400" />
                 Painel de Tarefas Críticas do Buffet — Restrições Alimentares
               </CardTitle>
-              <CardDescription className="text-xs text-amber-900">
+              <CardDescription className="text-xs text-neutral-400">
                 Cada restrição é tratada com rastreamento estrito de preparo, entrega e responsável
                 para garantir segurança alimentar.
               </CardDescription>
             </div>
-            <Badge className="bg-amber-200 text-amber-950 border-amber-400 font-bold self-start sm:self-auto">
+            <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold self-start sm:self-auto">
               {dietaryTasks.filter((t) => t.status !== 'ENTREGUE').length} prato(s) pendente(s)
             </Badge>
           </div>
@@ -459,31 +459,31 @@ export default function Buffet() {
               return (
                 <div
                   key={task.id}
-                  className={`p-4 rounded-2xl border-2 transition-all ${
+                  className={`p-4 rounded-2xl border transition-all ${
                     isDelivered
-                      ? 'border-neutral-200 bg-neutral-50 opacity-80'
+                      ? 'border-[#26221C] bg-[#141210] opacity-80'
                       : isReady
-                        ? 'border-emerald-500 bg-emerald-50/20 shadow-sm'
+                        ? 'border-emerald-500/70 bg-[#121E16] shadow-elevation'
                         : isInPrep
-                          ? 'border-amber-400 bg-amber-50/20'
-                          : 'border-red-400 bg-red-50/20'
+                          ? 'border-amber-500/70 bg-[#1E1912]'
+                          : 'border-red-500/70 bg-[#1F1212]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356] block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
                         CÓDIGO: {task.guest_code || 'REST-ESP'} •{' '}
                         {task.table_name || 'Mesa não inf.'}
                       </span>
-                      <h4 className="font-serif font-bold text-base text-[#1C1A17] mt-0.5">
+                      <h4 className="font-serif font-bold text-base text-white mt-0.5">
                         {task.guest_name}
                       </h4>
-                      <div className="text-xs font-bold text-amber-900 mt-1 flex items-center gap-1.5">
-                        <Utensils className="w-3.5 h-3.5 text-amber-700" />
+                      <div className="text-xs font-bold text-amber-300 mt-1 flex items-center gap-1.5">
+                        <Utensils className="w-3.5 h-3.5 text-amber-400" />
                         {task.restriction_type}
                       </div>
                       {task.details && (
-                        <p className="text-xs text-neutral-600 mt-1 bg-white p-2 rounded-lg border border-neutral-200">
+                        <p className="text-xs text-neutral-300 mt-1 bg-[#1C1813] p-2.5 rounded-xl border border-[#2F271D]">
                           {task.details}
                         </p>
                       )}
@@ -492,7 +492,7 @@ export default function Buffet() {
                     <Badge
                       className={`text-[10px] shrink-0 font-bold ${
                         isDelivered
-                          ? 'bg-neutral-800 text-white'
+                          ? 'bg-neutral-800 text-neutral-300'
                           : isReady
                             ? 'bg-emerald-600 text-white animate-bounce'
                             : isInPrep
@@ -505,13 +505,17 @@ export default function Buffet() {
                   </div>
 
                   {/* Flow checklist line */}
-                  <div className="mt-3 pt-2 border-t border-neutral-200 text-[11px] text-[#6B6356] flex flex-wrap items-center justify-between gap-2">
+                  <div className="mt-3 pt-2 border-t border-[#292218] text-[11px] text-neutral-400 flex flex-wrap items-center justify-between gap-2">
                     <span>
-                      Chef resp: <strong>{task.buffet_responsible || 'Chef Roberto'}</strong>
+                      Chef resp:{' '}
+                      <strong className="text-neutral-200">
+                        {task.buffet_responsible || 'Chef Roberto'}
+                      </strong>
                     </span>
                     {task.delivery_responsible && (
                       <span>
-                        Entregador: <strong>{task.delivery_responsible}</strong>
+                        Entregador:{' '}
+                        <strong className="text-neutral-200">{task.delivery_responsible}</strong>
                       </span>
                     )}
                   </div>
@@ -522,7 +526,7 @@ export default function Buffet() {
                       <Button
                         size="sm"
                         onClick={() => handleSaveDietaryTask(task.id, 'RECEBIDO')}
-                        className="w-full text-xs h-8 bg-neutral-800 hover:bg-neutral-900 text-white font-semibold"
+                        className="w-full text-xs h-8 bg-[#24201B] hover:bg-[#322C25] text-white border border-[#3D3528] font-semibold rounded-xl"
                       >
                         [1] Confirmar Recebimento na Cozinha
                       </Button>
@@ -531,7 +535,7 @@ export default function Buffet() {
                       <Button
                         size="sm"
                         onClick={() => handleSaveDietaryTask(task.id, 'EM_PREPARO')}
-                        className="w-full text-xs h-8 bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+                        className="w-full text-xs h-8 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl"
                       >
                         [2] Iniciar Preparo Exclusivo
                       </Button>
@@ -540,7 +544,7 @@ export default function Buffet() {
                       <Button
                         size="sm"
                         onClick={() => handleSaveDietaryTask(task.id, 'PRONTO')}
-                        className="w-full text-xs h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                        className="w-full text-xs h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
                       >
                         [3] Marcar como Prato Pronto!
                       </Button>
@@ -551,13 +555,13 @@ export default function Buffet() {
                         onClick={() => {
                           setEditingTask(task)
                         }}
-                        className="w-full text-xs h-8 bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow gap-1"
+                        className="w-full text-xs h-8 bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow gap-1 rounded-xl"
                       >
                         <Check className="w-3.5 h-3.5" /> [4] Confirmar Entrega na Mesa
                       </Button>
                     )}
                     {isDelivered && (
-                      <div className="w-full text-center text-xs text-emerald-700 font-semibold py-1 bg-emerald-50 rounded-lg">
+                      <div className="w-full text-center text-xs text-emerald-300 font-semibold py-1.5 bg-emerald-950/40 border border-emerald-800/60 rounded-xl">
                         ✓ Entregue com segurança às{' '}
                         {task.delivered_at
                           ? new Date(task.delivered_at).toLocaleTimeString('pt-BR')
@@ -575,29 +579,31 @@ export default function Buffet() {
       {/* DELIVERY CONFIRMATION MODAL */}
       {editingTask && (
         <Dialog open={!!editingTask} onOpenChange={(open) => !open && setEditingTask(null)}>
-          <DialogContent className="sm:max-w-[450px] bg-white">
+          <DialogContent className="sm:max-w-[450px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-900">
-                <ShieldCheck className="w-5 h-5 text-emerald-600" /> Confirmar Entrega do Prato
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-300">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" /> Confirmar Entrega do Prato
                 Especial
               </DialogTitle>
-              <DialogDescription>
-                Convidado: <strong>{editingTask.guest_name}</strong> ({editingTask.table_name})
+              <DialogDescription className="text-neutral-400 text-xs">
+                Convidado: <strong className="text-white">{editingTask.guest_name}</strong> (
+                {editingTask.table_name})
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 py-2 text-xs">
-              <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+              <div className="p-3 bg-[#1C1813] rounded-xl border border-[#2F271D]">
                 <div>
-                  Restrição: <strong>{editingTask.restriction_type}</strong>
+                  Restrição:{' '}
+                  <strong className="text-amber-300">{editingTask.restriction_type}</strong>
                 </div>
                 {editingTask.details && (
-                  <div className="text-neutral-500 mt-1">{editingTask.details}</div>
+                  <div className="text-neutral-400 mt-1">{editingTask.details}</div>
                 )}
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="deliv-resp" className="font-bold text-neutral-800">
+                <Label htmlFor="deliv-resp" className="font-bold text-neutral-300">
                   Nome do Garçom / Responsável pela Entrega:
                 </Label>
                 <Input
@@ -605,27 +611,30 @@ export default function Buffet() {
                   value={deliveryResponsible}
                   onChange={(e) => setDeliveryResponsible(e.target.value)}
                   placeholder="Nome do garçom"
-                  className="h-10"
+                  className="h-10 bg-[#12100E] border-[#383125] text-white"
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditingTask(null)}>
+              <Button
+                variant="outline"
+                onClick={() => setEditingTask(null)}
+                className="border-[#332D24] text-neutral-300 hover:bg-[#24201A]"
+              >
                 Cancelar
               </Button>
               <Button
                 onClick={() => handleSaveDietaryTask(editingTask.id, 'ENTREGUE')}
                 disabled={isUpdatingTask || !deliveryResponsible.trim()}
-                className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
               >
-                {isUpdatingTask ? 'Gravando...' : 'Confirmar Prato na Mesa'}
+                {isUpdatingTask ? 'Salvando...' : 'Confirmar Entrega na Mesa'}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
-
       {/* FULL SCREEN TELÃO LED SIMULATION MODAL (Requirement G.7) */}
       <Dialog open={isScreenModalOpen} onOpenChange={setIsScreenModalOpen}>
         <DialogContent className="sm:max-w-[900px] bg-[#12110F] text-white border-4 border-[#C5A45F] p-8 text-center rounded-3xl shadow-2xl">
