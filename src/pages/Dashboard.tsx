@@ -2,79 +2,90 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   eventService,
-  honoreeService,
   guestService,
   tableService,
-  teamService,
-  supplierService,
-  timelineService,
-  alertService,
+  checklistService,
+  honoreeService,
+  dietaryService,
+  occurrenceService,
+  buffetReleaseService,
+  whatsappService,
+  auditService,
 } from '@/services/celebraService'
 import { useRealtime } from '@/hooks/use-realtime'
 import type {
   EventRecord,
-  HonoreeRecord,
   GuestRecord,
   TableRecord,
-  TimelineItemRecord,
-  AlertRecord,
+  ChecklistItemRecord,
+  HonoreeRecord,
+  DietaryTaskRecord,
+  OccurrenceRecord,
+  BuffetReleaseRecord,
+  WhatsappMessageRecord,
 } from '@/types/celebra'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
-  Award,
+  ShieldAlert,
+  CheckCircle2,
   Users,
-  UserCheck,
-  UserX,
-  Grid,
-  ShieldCheck,
-  Truck,
+  QrCode,
+  Utensils,
+  Award,
   AlertTriangle,
-  Clock,
-  Radio,
-  ArrowRight,
+  Send,
   Sparkles,
-  ChevronRight,
-  TrendingUp,
+  ArrowRight,
+  Clock,
+  Lock,
+  PhoneCall,
+  Tv,
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 export default function Dashboard() {
   const { eventId } = useParams<{ eventId: string }>()
   const [event, setEvent] = useState<EventRecord | null>(null)
-  const [honorees, setHonorees] = useState<HonoreeRecord[]>([])
   const [guests, setGuests] = useState<GuestRecord[]>([])
   const [tables, setTables] = useState<TableRecord[]>([])
-  const [timelineItems, setTimelineItems] = useState<TimelineItemRecord[]>([])
-  const [alerts, setAlerts] = useState<AlertRecord[]>([])
-  const [teamCount, setTeamCount] = useState<number>(0)
-  const [supplierCount, setSupplierCount] = useState<number>(0)
+  const [checklist, setChecklist] = useState<ChecklistItemRecord[]>([])
+  const [honorees, setHonorees] = useState<HonoreeRecord[]>([])
+  const [dietaryTasks, setDietaryTasks] = useState<DietaryTaskRecord[]>([])
+  const [occurrences, setOccurrences] = useState<OccurrenceRecord[]>([])
+  const [releases, setReleases] = useState<BuffetReleaseRecord[]>([])
+  const [messages, setMessages] = useState<WhatsappMessageRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load all data
+  const { toast } = useToast()
+
   const loadData = async () => {
     if (!eventId) return
+    setIsLoading(true)
     try {
-      const [ev, hList, gList, tList, tmList, alList, teams, suppliers] = await Promise.all([
+      const [ev, gList, tList, cList, hList, dList, oList, rList, wList] = await Promise.all([
         eventService.getById(eventId),
-        honoreeService.list(eventId),
         guestService.list(eventId),
         tableService.list(eventId),
-        timelineService.list(eventId),
-        alertService.list(eventId),
-        teamService.list(eventId),
-        supplierService.list(eventId),
+        checklistService.list(eventId),
+        honoreeService.list(eventId),
+        dietaryService.list(eventId),
+        occurrenceService.list(eventId),
+        buffetReleaseService.list(eventId),
+        whatsappService.list(eventId),
       ])
       setEvent(ev)
-      setHonorees(hList)
       setGuests(gList)
       setTables(tList)
-      setTimelineItems(tmList)
-      setAlerts(alList)
-      setTeamCount(teams.length)
-      setSupplierCount(suppliers.length)
-    } catch (e) {
-      console.error('Erro ao carregar dados do dashboard:', e)
+      setChecklist(cList)
+      setHonorees(hList)
+      setDietaryTasks(dList)
+      setOccurrences(oList)
+      setReleases(rList)
+      setMessages(wList)
+    } catch (_) {
+      toast({ title: 'Erro ao carregar dados operacionais', variant: 'destructive' })
     } finally {
       setIsLoading(false)
     }
@@ -84,7 +95,14 @@ export default function Dashboard() {
     loadData()
   }, [eventId])
 
-  // Realtime subscriptions
+  // Realtime updates
+  useRealtime<ChecklistItemRecord>('checklist_items', () => {
+    if (eventId)
+      checklistService
+        .list(eventId)
+        .then(setChecklist)
+        .catch(() => {})
+  })
   useRealtime<GuestRecord>('guests', () => {
     if (eventId)
       guestService
@@ -92,23 +110,6 @@ export default function Dashboard() {
         .then(setGuests)
         .catch(() => {})
   })
-
-  useRealtime<TimelineItemRecord>('timeline_items', () => {
-    if (eventId)
-      timelineService
-        .list(eventId)
-        .then(setTimelineItems)
-        .catch(() => {})
-  })
-
-  useRealtime<AlertRecord>('alerts', () => {
-    if (eventId)
-      alertService
-        .list(eventId)
-        .then(setAlerts)
-        .catch(() => {})
-  })
-
   useRealtime<TableRecord>('tables', () => {
     if (eventId)
       tableService
@@ -116,398 +117,482 @@ export default function Dashboard() {
         .then(setTables)
         .catch(() => {})
   })
+  useRealtime<OccurrenceRecord>('occurrences', () => {
+    if (eventId)
+      occurrenceService
+        .list(eventId)
+        .then(setOccurrences)
+        .catch(() => {})
+  })
 
-  // Computed metrics
+  // J. RESPOSTAS IMEDIATAS DO DASHBOARD CENTRAL:
+  // 1. Evento pronto para abrir?
+  const criticalChecklistPending = useMemo(() => {
+    return checklist.filter(
+      (c) => c.is_critical && c.status !== 'CONCLUIDO' && !c.bypass_authorized_by,
+    )
+  }, [checklist])
+
+  const tablesWithDivergence = useMemo(() => {
+    return tables.filter(
+      (t) =>
+        t.conference_status === 'DIVERGENTE' ||
+        (t.planned_chairs !== undefined &&
+          t.physical_chairs !== undefined &&
+          t.planned_chairs !== t.physical_chairs),
+    )
+  }, [tables])
+
+  const isEventReadyToOpen =
+    checklist.length > 0 &&
+    criticalChecklistPending.length === 0 &&
+    tablesWithDivergence.length === 0
+
+  // 2. Quantas pendências?
+  const totalPendingChecklist = checklist.filter(
+    (c) => c.status !== 'CONCLUIDO' && !c.bypass_authorized_by,
+  ).length
+
+  // 3. Confirmados e Entradas
   const totalGuests = guests.length
-  const confirmedGuests = guests.filter(
-    (g) => g.status === 'CONFIRMADO' || g.confirmation === 'CONFIRMADO',
-  ).length
-  const pendingGuests = guests.filter(
-    (g) => g.status === 'PENDENTE' || g.confirmation === 'PENDENTE',
-  ).length
   const presentGuests = guests.filter((g) => g.status === 'PRESENTE').length
-  const absentGuests = guests.filter((g) => g.status === 'NAO_COMPARECEU').length
 
-  const totalSeats = tables.reduce((acc, t) => acc + (t.capacity || 0), 0)
-  const assignedSeats = guests.filter((g) => !!g.table_id).length
-  const availableSeats = Math.max(0, totalSeats - assignedSeats)
-  const contingencyCapacity = tables
-    .filter((t) => t.is_reserve)
-    .reduce((acc, t) => acc + (t.capacity || 0), 0)
+  // 4. Mesas já liberadas para buffet
+  const tablesReleasedBuffet = tables.filter(
+    (t) => t.buffet_status && t.buffet_status !== 'AGUARDANDO',
+  ).length
 
-  const activeAlerts = alerts.filter((a) => !a.is_resolved)
+  // 5. Próximo homenageado
+  const onStageHonoree = honorees.find((h) => h.operational_state === 'NO_PALCO')
+  const nextHonoree =
+    honorees.find((h) => h.operational_state === 'PROXIMO') ||
+    honorees.find((h) => h.operational_state === 'EM_PREPARACAO') ||
+    honorees.find((h) => h.operational_state === 'AGUARDANDO')
 
-  // Timeline AGORA / PRÓXIMO / DEPOIS
-  const timelineSummary = useMemo(() => {
-    if (!timelineItems.length) return { agora: null, proximo: null, depois: [] }
+  // 6. Restrições alimentares pendentes
+  const pendingDietary = dietaryTasks.filter((d) => d.status !== 'ENTREGUE').length
 
-    // Check if an item is "EM_ANDAMENTO"
-    const inProgress = timelineItems.find((i) => i.status === 'EM_ANDAMENTO')
-    const pendingItems = timelineItems.filter(
-      (i) => i.status === 'A_PREPARAR' || i.status === 'PRONTO',
-    )
+  // 7. Ocorrências abertas
+  const openOccurrences = occurrences.filter((o) => !o.solution || o.solution.trim() === '').length
 
-    const agora = inProgress || pendingItems[0] || null
-    const remaining = pendingItems.filter((i) => i.id !== agora?.id)
-    const proximo = remaining[0] || null
-    const depois = remaining.slice(1, 4)
-
-    return { agora, proximo, depois }
-  }, [timelineItems])
-
-  const formattedDate = event?.date
-    ? new Date(event.date)
-        .toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        })
-        .toUpperCase()
-    : '07 NOV 2026'
-
-  if (isLoading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C5A45F] border-t-transparent" />
-          <p className="text-sm font-medium text-[#6B6356]">Atualizando Central da Festa...</p>
-        </div>
-      </div>
-    )
-  }
+  // 8. Qual responsável acionar agora?
+  const urgentResponsible =
+    criticalChecklistPending[0]?.responsible ||
+    (tablesWithDivergence.length > 0 ? 'Renato Apoio (Mesas)' : 'Hugo Cerimonial')
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-6 lg:py-8 space-y-6">
-      {/* Header Central */}
-      <div className="bg-[#1C1A17] text-white rounded-2xl p-6 lg:p-8 shadow-xl border border-[#2D2A26] relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-full bg-gradient-to-l from-[#C5A45F]/10 to-transparent pointer-events-none" />
+    <div className="max-w-[1400px] mx-auto px-4 py-4 sm:py-6 space-y-6 pb-24">
+      {/* Top Main Status Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
+            <Sparkles className="w-4 h-4" /> Centro de Comando Operacional — Festa dos Destaques
+            2026
+          </div>
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+            Dashboard Geral de Prontidão do Evento
+          </h1>
+          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+            Coordenação Geral: Hugo Cerimonial & Renato Apoio • 30 Homenageados • ~400 Convidados •
+            20 Mesas
+          </p>
+        </div>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
-              <Sparkles className="w-3.5 h-3.5" /> Central Operacional do Evento
+        <div className="flex items-center gap-2">
+          <Link to={`/events/${eventId}/live`}>
+            <Button className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-bold text-xs h-10 gap-2 border border-[#3D3833] shadow">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
+              Entrar no Modo Evento ao Vivo
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* CORE READINESS HERO CARD (Responde imediatamente: Evento pronto para abrir?) */}
+      <div
+        className={`p-5 sm:p-6 rounded-2xl border-4 shadow-xl transition-all ${
+          isEventReadyToOpen
+            ? 'bg-emerald-950 border-emerald-500 text-white'
+            : 'bg-red-950 border-red-600 text-white'
+        }`}
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-4">
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${
+                isEventReadyToOpen
+                  ? 'bg-emerald-800 border-emerald-600 text-emerald-200'
+                  : 'bg-red-800 border-red-500 text-red-100 animate-pulse'
+              }`}
+            >
+              {isEventReadyToOpen ? (
+                <CheckCircle2 className="w-8 h-8" />
+              ) : (
+                <ShieldAlert className="w-8 h-8" />
+              )}
             </div>
-            <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white uppercase">
-              {event?.name || 'FESTA DOS DESTAQUES'}
-            </h1>
-            <p className="text-xs sm:text-sm text-neutral-300 mt-1 flex items-center gap-2">
-              <span className="font-semibold text-[#C5A45F]">{formattedDate}</span>
-              <span>•</span>
-              <span>
-                Perfil: <strong className="text-white">{event?.profile || 'Elegante'}</strong>
+
+            <div>
+              <span className="text-[11px] font-mono font-bold uppercase tracking-widest opacity-80">
+                PERGUNTA 1: EVENTO PRONTO PARA ABRIR ÀS 19:00?
               </span>
-              <span>•</span>
-              <span className="text-emerald-400 font-medium">
-                Status: {event?.status || 'ATIVO'}
-              </span>
-            </p>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold mt-0.5">
+                {isEventReadyToOpen
+                  ? 'SIM — 100% HOMOLOGADO PARA RECEBER CONVIDADOS'
+                  : 'NÃO — SALÃO BLOQUEADO POR PENDÊNCIAS CRÍTICAS'}
+              </h2>
+              <p className="text-xs sm:text-sm opacity-90 mt-1">
+                {isEventReadyToOpen
+                  ? 'Todas as 20 mesas conferidas, palco pronto, buffet aquecido e rotas acessíveis livres.'
+                  : `${criticalChecklistPending.length} item(ns) crítico(s) sem autorização e ${tablesWithDivergence.length} mesa(s) com divergência física de cadeiras.`}
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Link to={`/app/${eventId}/live`}>
-              <Button className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold gap-2 text-sm shadow-lg h-11 px-5">
-                <Radio className="w-4 h-4 animate-pulse" />
-                Abrir Modo Ao Vivo
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+            <Link to={`/events/${eventId}/checklist`}>
+              <Button
+                className={`font-serif font-bold text-xs h-11 px-5 rounded-xl ${
+                  isEventReadyToOpen
+                    ? 'bg-white text-emerald-950 hover:bg-neutral-100'
+                    : 'bg-white text-red-950 hover:bg-neutral-100'
+                }`}
+              >
+                Ver Checklist Pré-Abertura
               </Button>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        {/* Homenageados */}
-        <Link to={`/app/${eventId}/honorees`} className="group">
-          <Card className="hover:border-[#C5A45F] transition-all bg-white shadow-sm hover:shadow group-hover:-translate-y-0.5">
-            <CardHeader className="p-4 pb-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wider text-[#6B6356] font-semibold">
-                  Homenageados
-                </span>
-                <Award className="w-4 h-4 text-[#C5A45F]" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl lg:text-3xl font-bold text-[#1C1A17]">{honorees.length}</div>
-              <p className="text-[11px] text-[#6B6356] mt-0.5">Personalidades</p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Convidados Total */}
-        <Link to={`/app/${eventId}/guests`} className="group">
-          <Card className="hover:border-[#C5A45F] transition-all bg-white shadow-sm hover:shadow group-hover:-translate-y-0.5">
-            <CardHeader className="p-4 pb-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wider text-[#6B6356] font-semibold">
-                  Convidados
-                </span>
-                <Users className="w-4 h-4 text-blue-600" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl lg:text-3xl font-bold text-[#1C1A17]">{totalGuests}</div>
-              <div className="flex items-center gap-2 text-[11px] mt-0.5">
-                <span className="text-emerald-700 font-medium">{confirmedGuests} conf.</span>
-                <span className="text-[#6B6356]">•</span>
-                <span className="text-amber-700">{pendingGuests} pend.</span>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Presentes no Evento (LIVE) */}
-        <Link to={`/app/${eventId}/checkin`} className="group">
-          <Card className="hover:border-emerald-500 transition-all bg-emerald-50/50 border-emerald-200 shadow-sm hover:shadow group-hover:-translate-y-0.5">
-            <CardHeader className="p-4 pb-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wider text-emerald-800 font-semibold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping inline-block" />
-                  Presentes
-                </span>
-                <UserCheck className="w-4 h-4 text-emerald-700" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl lg:text-3xl font-bold text-emerald-900">{presentGuests}</div>
-              <div className="flex items-center justify-between text-[11px] text-emerald-800 mt-0.5">
-                <span>
-                  {totalGuests > 0
-                    ? `${Math.round((presentGuests / totalGuests) * 100)}% da lista`
-                    : '0%'}
-                </span>
-                {absentGuests > 0 && (
-                  <span className="text-neutral-500 flex items-center gap-0.5">
-                    <UserX className="w-3 h-3" /> {absentGuests} aus.
-                  </span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Mesas & Lugares */}
-        <Link to={`/app/${eventId}/tables`} className="group">
-          <Card className="hover:border-[#C5A45F] transition-all bg-white shadow-sm hover:shadow group-hover:-translate-y-0.5">
-            <CardHeader className="p-4 pb-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wider text-[#6B6356] font-semibold">
-                  Mesas / Lugares
-                </span>
-                <Grid className="w-4 h-4 text-[#C5A45F]" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl lg:text-3xl font-bold text-[#1C1A17]">
-                {tables.length} <span className="text-xs font-normal text-[#6B6356]">mesas</span>
-              </div>
-              <p className="text-[11px] text-[#6B6356] mt-0.5">
-                <strong className="text-[#1C1A17]">{assignedSeats}</strong> ocup. /{' '}
-                <strong className="text-emerald-700">{availableSeats}</strong> vagos
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Mesa Reserva / Contingência */}
-        <Link to={`/app/${eventId}/tables`} className="group">
-          <Card className="hover:border-amber-400 transition-all bg-amber-50/50 border-amber-200 shadow-sm hover:shadow group-hover:-translate-y-0.5">
-            <CardHeader className="p-4 pb-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wider text-amber-800 font-semibold">
-                  Contingência
-                </span>
-                <ShieldCheck className="w-4 h-4 text-amber-700" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl lg:text-3xl font-bold text-amber-900">
-                {contingencyCapacity}
-              </div>
-              <p className="text-[11px] text-amber-800 mt-0.5">Lugares na Reserva</p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Alertas / Equipes */}
-        <Link to={`/app/${eventId}/timeline`} className="group">
-          <Card
-            className={`transition-all shadow-sm hover:shadow group-hover:-translate-y-0.5 ${
-              activeAlerts.length > 0 ? 'bg-red-50/50 border-red-200' : 'bg-white'
-            }`}
-          >
-            <CardHeader className="p-4 pb-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wider text-[#6B6356] font-semibold">
-                  Alertas Ativos
-                </span>
-                <AlertTriangle
-                  className={`w-4 h-4 ${activeAlerts.length > 0 ? 'text-red-600' : 'text-neutral-400'}`}
-                />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div
-                className={`text-2xl lg:text-3xl font-bold ${activeAlerts.length > 0 ? 'text-red-700' : 'text-[#1C1A17]'}`}
+      {/* 8 BIG OPERATIONAL METRIC CARDS (Requirements J: Cartões, cores, alertas e botões grandes) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Pendências e Críticas */}
+        <Link to={`/events/${eventId}/checklist`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">Pendências</span>
+              <Badge
+                className={`text-[10px] font-bold ${
+                  criticalChecklistPending.length > 0
+                    ? 'bg-red-600 text-white'
+                    : 'bg-emerald-600 text-white'
+                }`}
               >
-                {activeAlerts.length}
-              </div>
-              <p className="text-[11px] text-[#6B6356] mt-0.5">
-                {teamCount} equipes • {supplierCount} forn.
-              </p>
-            </CardContent>
+                {criticalChecklistPending.length} Críticas
+              </Badge>
+            </div>
+            <div className="text-3xl font-serif font-bold text-[#1C1A17] mt-1 group-hover:text-[#C5A45F]">
+              {totalPendingChecklist}
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>de {checklist.length} itens totais</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
           </Card>
+        </Link>
+
+        {/* Card 2: Entradas / Check-in */}
+        <Link to={`/events/${eventId}/checkin`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+                Entradas Recepção
+              </span>
+              <Badge className="bg-emerald-100 text-emerald-900 border-emerald-300 text-[10px] font-bold">
+                Check-in QR
+              </Badge>
+            </div>
+            <div className="text-3xl font-serif font-bold text-emerald-700 mt-1">
+              {presentGuests}{' '}
+              <span className="text-base font-normal text-neutral-400">/ {totalGuests}</span>
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>
+                {totalGuests > 0 ? Math.round((presentGuests / totalGuests) * 100) : 0}% presentes
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
+          </Card>
+        </Link>
+
+        {/* Card 3: Mesas com Divergência */}
+        <Link to={`/events/${eventId}/tables`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+                Mesas & Cadeiras
+              </span>
+              <Badge
+                className={`text-[10px] font-bold ${
+                  tablesWithDivergence.length > 0
+                    ? 'bg-red-600 text-white animate-pulse'
+                    : 'bg-emerald-600 text-white'
+                }`}
+              >
+                {tablesWithDivergence.length > 0 ? 'Divergência!' : '100% OK'}
+              </Badge>
+            </div>
+            <div className="text-3xl font-serif font-bold text-[#1C1A17] mt-1">
+              {tablesWithDivergence.length}{' '}
+              <span className="text-sm font-normal text-neutral-400">mesa(s)</span>
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>{tables.length} mesas planejadas</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
+          </Card>
+        </Link>
+
+        {/* Card 4: Liberação Buffet */}
+        <Link to={`/events/${eventId}/buffet`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+                Buffet em Ondas
+              </span>
+              <Badge className="bg-indigo-100 text-indigo-900 border-indigo-300 text-[10px] font-bold">
+                Ondas de 2-3
+              </Badge>
+            </div>
+            <div className="text-3xl font-serif font-bold text-indigo-700 mt-1">
+              {tablesReleasedBuffet}{' '}
+              <span className="text-sm font-normal text-neutral-400">liberadas</span>
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>{releases.length} ondas realizadas</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
+          </Card>
+        </Link>
+
+        {/* Card 5: Próximo Homenageado */}
+        <Link to={`/events/${eventId}/honorees`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+                Homenageados (30)
+              </span>
+              <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold">
+                No Palco Agora
+              </Badge>
+            </div>
+            <div className="font-serif font-bold text-base text-[#1C1A17] mt-1 truncate">
+              {onStageHonoree ? onStageHonoree.name : 'Aguardando Início'}
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>Próximo: {nextHonoree ? nextHonoree.name : '—'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
+          </Card>
+        </Link>
+
+        {/* Card 6: Restrições Alimentares */}
+        <Link to={`/events/${eventId}/buffet`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">
+                Pratos Especiais
+              </span>
+              <Badge
+                className={`text-[10px] font-bold ${
+                  pendingDietary > 0 ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white'
+                }`}
+              >
+                {pendingDietary > 0 ? 'Pendente' : '100% Entregue'}
+              </Badge>
+            </div>
+            <div className="text-3xl font-serif font-bold text-amber-700 mt-1">
+              {pendingDietary} <span className="text-sm font-normal text-neutral-400">pratos</span>
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>{dietaryTasks.length} restrições severas</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
+          </Card>
+        </Link>
+
+        {/* Card 7: Ocorrências Abertas */}
+        <Link to={`/events/${eventId}/occurrences`}>
+          <Card className="hover:shadow-md transition-all border-2 border-neutral-200 bg-white p-4 h-full cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#6B6356]">Ocorrências</span>
+              <Badge
+                className={`text-[10px] font-bold ${
+                  openOccurrences > 0 ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+                }`}
+              >
+                {openOccurrences} Abertas
+              </Badge>
+            </div>
+            <div className="text-3xl font-serif font-bold text-[#1C1A17] mt-1">
+              {occurrences.length}
+            </div>
+            <div className="text-[11px] text-[#6B6356] mt-1 flex items-center justify-between">
+              <span>todas auditadas</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#C5A45F]" />
+            </div>
+          </Card>
+        </Link>
+
+        {/* Card 8: Responsável para Acionar */}
+        <div className="bg-[#1C1A17] text-white p-4 rounded-2xl border border-[#332E27] flex flex-col justify-between">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#C5A45F]">
+              ACIONAL PRIORITÁRIO
+            </div>
+            <div className="font-serif font-bold text-base text-white mt-1 leading-snug">
+              {urgentResponsible}
+            </div>
+            <div className="text-[11px] text-neutral-400 mt-0.5">Acionar via WhatsApp simulado</div>
+          </div>
+          <Link to={`/events/${eventId}/live`}>
+            <Button
+              size="sm"
+              className="w-full mt-2 bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold text-xs h-8"
+            >
+              Acionar Agora
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* QUICK WORKFLOW ACCESS SHORTCUTS */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+        <Link to={`/events/${eventId}/checkin`}>
+          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
+            <QrCode className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
+            <span className="text-xs font-bold text-[#1C1A17] block">Check-in QR</span>
+            <span className="text-[10px] text-neutral-400">Recepção</span>
+          </div>
+        </Link>
+
+        <Link to={`/events/${eventId}/tables`}>
+          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
+            <Users className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
+            <span className="text-xs font-bold text-[#1C1A17] block">Mapa 20 Mesas</span>
+            <span className="text-[10px] text-neutral-400">Trava & Cadeiras</span>
+          </div>
+        </Link>
+
+        <Link to={`/events/${eventId}/checklist`}>
+          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
+            <ShieldAlert className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
+            <span className="text-xs font-bold text-[#1C1A17] block">Checklist</span>
+            <span className="text-[10px] text-neutral-400">16 Áreas</span>
+          </div>
+        </Link>
+
+        <Link to={`/events/${eventId}/buffet`}>
+          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
+            <Utensils className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
+            <span className="text-xs font-bold text-[#1C1A17] block">Buffet & Telão</span>
+            <span className="text-[10px] text-neutral-400">Ondas 2-3</span>
+          </div>
+        </Link>
+
+        <Link to={`/events/${eventId}/honorees`}>
+          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
+            <Award className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
+            <span className="text-xs font-bold text-[#1C1A17] block">30 Homenageados</span>
+            <span className="text-[10px] text-neutral-400">11 Estados</span>
+          </div>
+        </Link>
+
+        <Link to={`/events/${eventId}/live`}>
+          <div className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-[#C5A45F] text-center cursor-pointer transition-all shadow-sm">
+            <Clock className="w-5 h-5 mx-auto text-[#C5A45F] mb-1" />
+            <span className="text-xs font-bold text-[#1C1A17] block">Evento ao Vivo</span>
+            <span className="text-[10px] text-neutral-400">Centro Tempo Real</span>
+          </div>
         </Link>
       </div>
 
-      {/* Roteiro / Timeline Resumida: AGORA / PRÓXIMO / DEPOIS */}
-      <Card className="bg-white border-neutral-200 shadow-sm">
-        <CardHeader className="border-b border-neutral-100 pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#C5A45F]" />
-              <CardTitle className="text-lg font-serif font-bold text-[#1C1A17]">
-                Linha do Tempo Operacional
+      {/* WHATSAPP ACTIVITY & AUDIT LOG PREVIEW (Requirements L & M) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Simulated WhatsApp Feed */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-serif font-bold text-[#1C1A17] flex items-center gap-2">
+                <Send className="w-4 h-4 text-emerald-600" />
+                WhatsApp Operacional Simulado
               </CardTitle>
+              <CardDescription className="text-xs">
+                {messages.length} disparos registrados (ondas de buffet, avisos aos homenageados,
+                cobranças de checklist)
+              </CardDescription>
             </div>
-            <Link
-              to={`/app/${eventId}/timeline`}
-              className="text-xs font-semibold text-[#C5A45F] hover:underline inline-flex items-center gap-1"
-            >
-              Ver roteiro completo <ChevronRight className="w-3.5 h-3.5" />
+            <Badge className="bg-emerald-100 text-emerald-900 border-emerald-300 text-[10px]">
+              Canal Principal
+            </Badge>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2.5 max-h-[280px] overflow-y-auto">
+            {messages.slice(0, 5).map((m) => (
+              <div
+                key={m.id}
+                className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs space-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <strong className="text-[#1C1A17]">{m.recipient_name}</strong>
+                  <Badge className="bg-neutral-800 text-[#C5A45F] text-[9px]">{m.status}</Badge>
+                </div>
+                <p className="text-neutral-600 text-[11px] leading-relaxed">{m.message}</p>
+                <div className="text-[9px] text-neutral-400 flex items-center justify-between pt-1">
+                  <span>Categoria: {m.category}</span>
+                  <span>
+                    {m.sent_at ? new Date(m.sent_at).toLocaleTimeString('pt-BR') : 'Agora'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Live Ocorrências & Ações Rápidas */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-serif font-bold text-[#1C1A17] flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                Ocorrências & Resoluções de Salão
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Histórico com responsável, setor e solução registrada
+              </CardDescription>
+            </div>
+            <Link to={`/events/${eventId}/occurrences`}>
+              <Button size="sm" variant="outline" className="text-xs h-7 text-[#C5A45F]">
+                Ver Todas
+              </Button>
             </Link>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* AGORA */}
-            <div className="p-4 rounded-xl bg-[#1C1A17] text-white border border-[#332E27] relative">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                  AGORA
-                </span>
-                <span className="text-xs text-[#C5A45F] font-semibold">
-                  {timelineSummary.agora?.scheduled_time
-                    ? new Date(timelineSummary.agora.scheduled_time).toLocaleTimeString('pt-BR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
-                    : '19:00'}
-                </span>
-              </div>
-              <h3 className="font-serif font-bold text-base text-white line-clamp-2">
-                {timelineSummary.agora?.title || 'Recepção dos Convidados'}
-              </h3>
-              <p className="text-xs text-neutral-400 mt-1 line-clamp-2">
-                {timelineSummary.agora?.description || 'Acolhimento e direcionamento das famílias.'}
-              </p>
-              {timelineSummary.agora?.responsibles && (
-                <div className="mt-3 text-[11px] text-neutral-300 border-t border-[#2A2723] pt-2">
-                  <span className="text-neutral-500">Resp:</span>{' '}
-                  {timelineSummary.agora.responsibles}
+          </CardHeader>
+          <CardContent className="p-4 space-y-2.5 max-h-[280px] overflow-y-auto">
+            {occurrences.slice(0, 5).map((o) => (
+              <div
+                key={o.id}
+                className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs space-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px]">
+                    {o.category}
+                  </Badge>
+                  <span className="text-[10px] text-neutral-500">Resp: {o.responsible}</span>
                 </div>
-              )}
-            </div>
-
-            {/* PRÓXIMO */}
-            <div className="p-4 rounded-xl bg-[#F8F7F4] border border-neutral-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-500/10 text-amber-800 border border-amber-300">
-                  PRÓXIMO MOMENTO
-                </span>
-                <span className="text-xs text-[#6B6356] font-semibold">
-                  {timelineSummary.proximo?.scheduled_time
-                    ? new Date(timelineSummary.proximo.scheduled_time).toLocaleTimeString('pt-BR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
-                    : '20:00'}
-                </span>
+                <p className="text-[#1C1A17] font-semibold text-[11px]">{o.description}</p>
+                {o.solution ? (
+                  <div className="text-[10px] text-emerald-700 bg-emerald-50 p-1 rounded font-medium">
+                    ✓ Solução: {o.solution}
+                  </div>
+                ) : (
+                  <div className="text-[10px] text-red-600 font-bold">
+                    Pendente de resolução pela coordenação
+                  </div>
+                )}
               </div>
-              <h3 className="font-serif font-bold text-base text-[#1C1A17] line-clamp-2">
-                {timelineSummary.proximo?.title || 'Abertura Oficial e Boas-Vindas'}
-              </h3>
-              <p className="text-xs text-[#6B6356] mt-1 line-clamp-2">
-                {timelineSummary.proximo?.description ||
-                  'Hugo sobe ao palco para abertura institucional.'}
-              </p>
-              {timelineSummary.proximo?.responsibles && (
-                <div className="mt-3 text-[11px] text-[#6B6356] border-t border-neutral-200 pt-2">
-                  <span className="text-neutral-400">Resp:</span>{' '}
-                  {timelineSummary.proximo.responsibles}
-                </div>
-              )}
-            </div>
-
-            {/* DEPOIS */}
-            <div className="p-4 rounded-xl bg-white border border-neutral-200">
-              <div className="text-[10px] uppercase font-bold tracking-wider text-[#6B6356] mb-2">
-                A SEGUIR (DEPOIS)
-              </div>
-              {timelineSummary.depois.length > 0 ? (
-                <ul className="space-y-2.5">
-                  {timelineSummary.depois.map((item) => (
-                    <li
-                      key={item.id}
-                      className="text-xs flex items-start gap-2 border-b border-neutral-100 pb-2 last:border-0 last:pb-0"
-                    >
-                      <span className="font-semibold text-[#C5A45F] shrink-0">
-                        {item.scheduled_time
-                          ? new Date(item.scheduled_time).toLocaleTimeString('pt-BR', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : '--:--'}
-                      </span>
-                      <span className="text-[#221E1A] line-clamp-1">{item.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-neutral-400">Nenhum evento posterior cadastrado.</p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Fast Action Shortcuts */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Link to={`/app/${eventId}/checkin`}>
-          <Button
-            variant="outline"
-            className="w-full justify-start h-12 bg-white hover:bg-neutral-50 text-xs sm:text-sm border-neutral-200 gap-2 font-medium"
-          >
-            <UserCheck className="w-4 h-4 text-emerald-700" />
-            Check-in Rápido
-          </Button>
-        </Link>
-        <Link to={`/app/${eventId}/tables`}>
-          <Button
-            variant="outline"
-            className="w-full justify-start h-12 bg-white hover:bg-neutral-50 text-xs sm:text-sm border-neutral-200 gap-2 font-medium"
-          >
-            <Grid className="w-4 h-4 text-[#C5A45F]" />
-            Organização das Mesas
-          </Button>
-        </Link>
-        <Link to={`/app/${eventId}/occurrences`}>
-          <Button
-            variant="outline"
-            className="w-full justify-start h-12 bg-white hover:bg-neutral-50 text-xs sm:text-sm border-neutral-200 gap-2 font-medium"
-          >
-            <AlertTriangle className="w-4 h-4 text-amber-700" />
-            Registrar Ocorrência
-          </Button>
-        </Link>
-        <Link to={`/app/${eventId}/live`}>
-          <Button className="w-full justify-start h-12 bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] text-xs sm:text-sm gap-2 font-bold shadow-sm">
-            <Radio className="w-4 h-4 text-[#C5A45F]" />
-            Comando Ao Vivo
-          </Button>
-        </Link>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-05T04:51:29.695Z",
+  "generatedAt": "2026-10-06T01:22:13.790Z",
   "collections": [
     {
       "name": "users",
@@ -146,6 +146,62 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "planned_chairs",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "physical_chairs",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conference_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["PENDENTE", "CONFERIDA", "DIVERGENTE", "BLOQUEADA"]
+        },
+        {
+          "name": "conference_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conference_photo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_locked",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "buffet_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["AGUARDANDO", "CHAMADA", "DIRIGINDO_AO_BUFFET", "ATENDIDA", "CONCLUIDA"]
+        },
+        {
+          "name": "special_needs_note",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operational_notes",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_tables_event_id ON tables (event_id)"]
@@ -491,6 +547,74 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "operational_state",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "AGUARDANDO",
+            "AVISADO",
+            "CONFIRMOU_RECEBIMENTO",
+            "EM_PREPARACAO",
+            "PROXIMO",
+            "CHAMADO",
+            "NO_PALCO",
+            "FOTOGRAFIA",
+            "CONCLUIDO",
+            "AUSENTE",
+            "EXCECAO"
+          ]
+        },
+        {
+          "name": "escort_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "table_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "tables"
+        },
+        {
+          "name": "stage_resources",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "music_cue",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "conductor_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "presentation_text",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "scheduled_time",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "actual_time",
+          "type": "date",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_honorees_event_id ON honorees (event_id)"]
@@ -592,6 +716,69 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "HOMENAGEADO",
+            "COMPRADOR",
+            "CONVIDADO_HOMENAGEADO",
+            "ACOMPANHANTE",
+            "INTEGRANTE_GRUPO"
+          ]
+        },
+        {
+          "name": "qr_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dietary_restriction",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "dietary_details",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "whatsapp_authorized",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "payment_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ISENTO", "PAGO", "PENDENTE", "CORTESIA"]
+        },
+        {
+          "name": "group_size",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "checkin_operator",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "checkin_mode",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["QR", "MANUAL"]
         }
       ],
       "indexes": [
@@ -802,6 +989,31 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "checkin_mode",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["QR", "MANUAL"]
+        },
+        {
+          "name": "operator",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "override_authorized_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_duplicate_override",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_checkins_event_id ON checkins (event_id)"]
@@ -873,6 +1085,680 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_occurrences_event_id ON occurrences (event_id)"]
+    },
+    {
+      "name": "checklist_items",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "events"
+        },
+        {
+          "name": "area",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "MESAS_CADEIRAS",
+            "ARRANJOS_DECORACAO",
+            "RECEPCAO",
+            "BUFFET",
+            "BEBIDAS",
+            "SOM",
+            "ILUMINACAO",
+            "TELAO",
+            "PALCO",
+            "FOTOGRAFIA",
+            "EQUIPE",
+            "FORNECEDORES",
+            "ACESSIBILIDADE",
+            "RESTRICOES_ALIMENTARES",
+            "CONTATOS_COMUNICACAO",
+            "MATERIAIS_CONTINGENCIA"
+          ]
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "responsible",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "supplier_sector",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deadline",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "priority",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["ALTA", "MEDIA", "BAIXA"]
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "NAO_INICIADO",
+            "EM_ANDAMENTO",
+            "AGUARDANDO_TERCEIRO",
+            "CONCLUIDO",
+            "BLOQUEADO",
+            "ATRASADO"
+          ]
+        },
+        {
+          "name": "evidence_notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "evidence_photo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "confirmed_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "received_confirmed",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "understood_confirmed",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_critical",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bypass_authorized_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bypass_justification",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "history_log",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_checklist_event_area ON checklist_items (event_id, area)",
+        "CREATE INDEX idx_checklist_status ON checklist_items (status)"
+      ]
+    },
+    {
+      "name": "chair_transfers",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "events"
+        },
+        {
+          "name": "source_table_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "tables"
+        },
+        {
+          "name": "target_table_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "tables"
+        },
+        {
+          "name": "chairs_count",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "requested_by",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "authorized_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["PENDENTE_APROVACAO", "APROVADA", "BLOQUEADA_NEGADA", "EXECUTADA"]
+        },
+        {
+          "name": "rejection_reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "timestamp",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_chair_transfers_event ON chair_transfers (event_id)"]
+    },
+    {
+      "name": "dietary_tasks",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "events"
+        },
+        {
+          "name": "guest_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "guests"
+        },
+        {
+          "name": "guest_code",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "guest_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "table_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "tables"
+        },
+        {
+          "name": "table_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "restriction_type",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "buffet_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "received_confirmed",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "received_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prepared_confirmed",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prepared_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivered_confirmed",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivered_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "delivery_responsible",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["PENDENTE", "RECEBIDO", "EM_PREPARO", "PRONTO", "ENTREGUE"]
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_dietary_event_status ON dietary_tasks (event_id, status)"]
+    },
+    {
+      "name": "buffet_releases",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "events"
+        },
+        {
+          "name": "wave_number",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "table_ids",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "table_names",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "operator",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "released_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "display_on_screen",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "whatsapp_sent_count",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["CHAMADAS", "DIRIGINDO_AO_BUFFET", "ATENDIDAS", "CONCLUIDAS"]
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_buffet_releases_event ON buffet_releases (event_id, wave_number)"
+      ]
+    },
+    {
+      "name": "whatsapp_messages",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "events"
+        },
+        {
+          "name": "recipient_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "recipient_phone",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "recipient_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "BUFFET_LIBERACAO",
+            "HOMENAGEADO_CHAMADA",
+            "COBRANCA_CHECKLIST",
+            "ALERTA_EQUIPE",
+            "GERAL"
+          ]
+        },
+        {
+          "name": "scheduled_for",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sent_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["PREPARADA", "ENVIADA", "ENTREGUE", "LIDA", "FALHOU"]
+        },
+        {
+          "name": "attempts",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "idempotency_key",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "error_details",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_whatsapp_event_cat ON whatsapp_messages (event_id, category)",
+        "CREATE INDEX idx_whatsapp_idemp ON whatsapp_messages (idempotency_key)"
+      ]
+    },
+    {
+      "name": "audit_logs",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "event_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "events"
+        },
+        {
+          "name": "actor_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "actor_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "target_entity",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "target_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "timestamp",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_audit_event_time ON audit_logs (event_id, timestamp)"]
     }
   ]
 }

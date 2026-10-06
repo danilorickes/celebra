@@ -4,22 +4,28 @@ import {
   eventService,
   timelineService,
   alertService,
-  teamService,
-  guestService,
-  tableService,
+  occurrenceService,
+  honoreeService,
+  buffetReleaseService,
+  whatsappService,
+  auditService,
 } from '@/services/celebraService'
 import { useRealtime } from '@/hooks/use-realtime'
 import type {
+  EventRecord,
   TimelineItemRecord,
   AlertRecord,
-  AcknowledgementRecord,
-  TeamRecord,
-  GuestRecord,
-  TableRecord,
+  OccurrenceRecord,
+  HonoreeRecord,
+  BuffetReleaseRecord,
+  WhatsappMessageRecord,
+  AuditLogRecord,
 } from '@/types/celebra'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -35,71 +41,148 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
-  Radio,
   Clock,
-  Play,
-  CheckCircle2,
-  AlertTriangle,
-  BellRing,
-  Users,
-  Grid,
-  ShieldCheck,
-  Check,
-  RotateCcw,
   Sparkles,
+  Award,
+  Utensils,
+  AlertTriangle,
+  Send,
+  CheckCircle2,
+  Tv,
+  Users,
+  ShieldCheck,
+  Plus,
+  RotateCcw,
+  History,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
+// ROLE SELECTION (Requirement I: Hugo, Renato, recepção, buffet, garçons, palco, som, iluminação, fotografia, fornecedores, admins)
+type OperationalRole =
+  | 'HUGO_COORD'
+  | 'RENATO_APOIO'
+  | 'RECEPCAO'
+  | 'BUFFET'
+  | 'GARCONS'
+  | 'PALCO'
+  | 'SOM'
+  | 'ILUMINACAO'
+  | 'FOTOGRAFIA'
+  | 'ADMIN'
+
+const ROLE_CONFIGS: Record<OperationalRole, { label: string; badge: string; focus: string }> = {
+  HUGO_COORD: {
+    label: 'Hugo Cerimonial (Coordenador Chefe)',
+    badge: 'bg-[#1C1A17] text-[#C5A45F]',
+    focus: 'Visão Geral, Decisões & Escalonamentos',
+  },
+  RENATO_APOIO: {
+    label: 'Renato Apoio (Coordenação Operacional)',
+    badge: 'bg-amber-900 text-amber-100',
+    focus: 'Mesas, Cadeiras & Condução de Homenageados',
+  },
+  RECEPCAO: {
+    label: 'Recepção & Credenciamento',
+    badge: 'bg-emerald-800 text-emerald-100',
+    focus: 'Check-in QR, Exceções & Fila de Entrada',
+  },
+  BUFFET: {
+    label: 'Buffet Gastronômico (Chef Roberto)',
+    badge: 'bg-amber-800 text-white',
+    focus: 'Liberação em Ondas & Pratos Especiais',
+  },
+  GARCONS: {
+    label: 'Equipe de Garçons & Salão',
+    badge: 'bg-neutral-800 text-neutral-200',
+    focus: 'Serviço de Mesas, Entrega de Restrições',
+  },
+  PALCO: {
+    label: 'Palco & Cerimonial',
+    badge: 'bg-purple-900 text-purple-100',
+    focus: '30 Homenageados, Ordem & Troféus',
+  },
+  SOM: {
+    label: 'Sonorização & DJ',
+    badge: 'bg-blue-900 text-blue-100',
+    focus: 'Trilhas Musicais & Microfones Lapela',
+  },
+  ILUMINACAO: {
+    label: 'Iluminação Cênica',
+    badge: 'bg-yellow-900 text-yellow-100',
+    focus: 'Cenas DMX & Foco do Palco',
+  },
+  FOTOGRAFIA: {
+    label: 'Fotografia & Telão LED',
+    badge: 'bg-indigo-900 text-indigo-100',
+    focus: 'Backdrop Oficial & Projeção',
+  },
+  ADMIN: {
+    label: 'Administrador / Danilo & Ana Paula',
+    badge: 'bg-neutral-900 text-white',
+    focus: 'Controle Total do Evento',
+  },
+}
+
 export default function Live() {
   const { eventId } = useParams<{ eventId: string }>()
-  const [timelineItems, setTimelineItems] = useState<TimelineItemRecord[]>([])
+  const [event, setEvent] = useState<EventRecord | null>(null)
+  const [timeline, setTimeline] = useState<TimelineItemRecord[]>([])
   const [alerts, setAlerts] = useState<AlertRecord[]>([])
-  const [acks, setAcks] = useState<AcknowledgementRecord[]>([])
-  const [teams, setTeams] = useState<TeamRecord[]>([])
-  const [guests, setGuests] = useState<GuestRecord[]>([])
-  const [tables, setTables] = useState<TableRecord[]>([])
-  const [currentTime, setCurrentTime] = useState<Date>(new Date())
+  const [occurrences, setOccurrences] = useState<OccurrenceRecord[]>([])
+  const [honorees, setHonorees] = useState<HonoreeRecord[]>([])
+  const [releases, setReleases] = useState<BuffetReleaseRecord[]>([])
+  const [messages, setMessages] = useState<WhatsappMessageRecord[]>([])
+  const [auditLogs, setAuditLogs] = useState<AuditLogRecord[]>([])
+  const [currentRole, setCurrentRole] = useState<OperationalRole>('HUGO_COORD')
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Delay Modal State
-  const [isDelayModalOpen, setIsDelayModalOpen] = useState(false)
-  const [delayInput, setDelayInput] = useState<number>(10)
-  const [recalcNext, setRecalcNext] = useState<boolean>(true)
+  // New Occurrence Dialog
+  const [isNewOccOpen, setIsNewOccOpen] = useState(false)
+  const [occCategory, setOccCategory] = useState<OccurrenceRecord['category']>('MESA')
+  const [occDesc, setOccDesc] = useState('')
+  const [occResp, setOccResp] = useState('Renato Apoio')
+  const [occSol, setOccSol] = useState('')
+  const [isSubmittingOcc, setIsSubmittingOcc] = useState(false)
 
-  // Alert Modal State
-  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false)
-  const [alertMsg, setAlertMsg] = useState('')
-  const [targetTeamId, setTargetTeamId] = useState('')
+  // Resolve Occurrence Modal
+  const [resolvingOcc, setResolvingOcc] = useState<OccurrenceRecord | null>(null)
+  const [solutionText, setSolutionText] = useState('')
+
+  // WhatsApp Broadcast Modal
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false)
+  const [broadcastTarget, setBroadcastTarget] = useState('TODOS_LIDERES')
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [isSendingBroadcast, setIsSendingBroadcast] = useState(false)
 
   const { toast } = useToast()
 
-  // Realtime clock ticker
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
-
   const loadData = async () => {
     if (!eventId) return
+    setIsLoading(true)
     try {
-      const [tList, alList, ackList, tmList, gList, tabList] = await Promise.all([
+      const [ev, tl, al, occ, hon, rel, msg, aud] = await Promise.all([
+        eventService.getById(eventId),
         timelineService.list(eventId),
         alertService.list(eventId),
-        alertService.listAcks(),
-        teamService.list(eventId),
-        guestService.list(eventId),
-        tableService.list(eventId),
+        occurrenceService.list(eventId),
+        honoreeService.list(eventId),
+        buffetReleaseService.list(eventId),
+        whatsappService.list(eventId),
+        auditService.list(eventId),
       ])
-      setTimelineItems(tList)
-      setAlerts(alList)
-      setAcks(ackList)
-      setTeams(tmList)
-      setGuests(gList)
-      setTables(tabList)
-    } catch {
-      /* intentionally ignored */
+      setEvent(ev)
+      setTimeline(tl)
+      setAlerts(al)
+      setOccurrences(occ)
+      setHonorees(hon)
+      setReleases(rel)
+      setMessages(msg)
+      setAuditLogs(aud)
+    } catch (_) {
+      toast({ title: 'Erro ao carregar dados ao vivo', variant: 'destructive' })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -107,600 +190,669 @@ export default function Live() {
     loadData()
   }, [eventId])
 
-  // Realtime updates on Live screen
+  // Realtime updates
   useRealtime<TimelineItemRecord>('timeline_items', () => {
     if (eventId)
       timelineService
         .list(eventId)
-        .then(setTimelineItems)
+        .then(setTimeline)
         .catch(() => {})
   })
-  useRealtime<AlertRecord>('alerts', () => {
+  useRealtime<OccurrenceRecord>('occurrences', () => {
     if (eventId)
-      alertService
+      occurrenceService
         .list(eventId)
-        .then(setAlerts)
+        .then(setOccurrences)
         .catch(() => {})
   })
-  useRealtime<AcknowledgementRecord>('acknowledgements', () => {
-    alertService
-      .listAcks()
-      .then(setAcks)
-      .catch(() => {})
-  })
-  useRealtime<GuestRecord>('guests', () => {
+  useRealtime<HonoreeRecord>('honorees', () => {
     if (eventId)
-      guestService
+      honoreeService
         .list(eventId)
-        .then(setGuests)
+        .then(setHonorees)
+        .catch(() => {})
+  })
+  useRealtime<BuffetReleaseRecord>('buffet_releases', () => {
+    if (eventId)
+      buffetReleaseService
+        .list(eventId)
+        .then(setReleases)
+        .catch(() => {})
+  })
+  useRealtime<WhatsappMessageRecord>('whatsapp_messages', () => {
+    if (eventId)
+      whatsappService
+        .list(eventId)
+        .then(setMessages)
         .catch(() => {})
   })
 
-  // AGORA & PRÓXIMO computation
-  const { currentItem, nextItem } = useMemo(() => {
-    const inProgress = timelineItems.find((i) => i.status === 'EM_ANDAMENTO')
-    const pending = timelineItems.filter((i) => i.status === 'A_PREPARAR' || i.status === 'PRONTO')
-    const current = inProgress || pending[0] || null
-    const next = pending.filter((i) => i.id !== current?.id)[0] || null
-    return { currentItem: current, nextItem: next }
-  }, [timelineItems])
+  // Timeline current item calculation
+  const currentTimelineItem = useMemo(() => {
+    return (
+      timeline.find((t) => t.status === 'EM_ANDAMENTO') ||
+      timeline.find((t) => t.status === 'PRONTO') ||
+      timeline[0]
+    )
+  }, [timeline])
 
-  // Countdown computation
-  const countdownText = useMemo(() => {
-    if (!nextItem?.scheduled_time) return '--:--'
-    const target = new Date(nextItem.scheduled_time).getTime()
-    const diff = target - currentTime.getTime()
-    if (diff <= 0) return '00:00 (Início iminente)'
-    const mins = Math.floor(diff / 60000)
-    const secs = Math.floor((diff % 60000) / 1000)
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
-  }, [nextItem, currentTime])
+  const nextTimelineItem = useMemo(() => {
+    if (!currentTimelineItem) return null
+    const idx = timeline.findIndex((t) => t.id === currentTimelineItem.id)
+    return timeline[idx + 1] || null
+  }, [timeline, currentTimelineItem])
 
-  // Complete current stage
-  const handleCompleteCurrent = async () => {
-    if (!currentItem) return
-    try {
-      await timelineService.update(currentItem.id, {
-        status: 'CONCLUIDO',
-        real_end_time: new Date().toISOString(),
-      })
-      // If there is a next item, automatically start it
-      if (nextItem) {
-        await timelineService.update(nextItem.id, {
-          status: 'EM_ANDAMENTO',
-          real_start_time: new Date().toISOString(),
-        })
-      }
-      toast({
-        title: 'Etapa concluída!',
-        description: `"${currentItem.title}" finalizado com sucesso.`,
-      })
-      loadData()
-    } catch (_) {
-      toast({ title: 'Erro ao concluir etapa', variant: 'destructive' })
-    }
-  }
+  // Current Honorees on stage & next
+  const onStageHonoree = honorees.find((h) => h.operational_state === 'NO_PALCO')
+  const nextHonoree = honorees.find((h) => h.operational_state === 'PROXIMO')
+  const upcomingHonorees = honorees
+    .filter((h) => h.operational_state !== 'CONCLUIDO' && h.operational_state !== 'NO_PALCO')
+    .slice(0, 3)
 
-  // Apply Delay in Live mode
-  const handleApplyLiveDelay = async () => {
-    if (!currentItem || !eventId) return
-    try {
-      const newDelay = (currentItem.delay_minutes || 0) + delayInput
-      await timelineService.update(currentItem.id, {
-        status: 'ATRASADO',
-        delay_minutes: newDelay,
-      })
+  // Latest Buffet Wave
+  const latestWave = releases[0]
 
-      if (recalcNext) {
-        const itemIndex = timelineItems.findIndex((i) => i.id === currentItem.id)
-        if (itemIndex >= 0) {
-          const subsequent = timelineItems.slice(itemIndex + 1)
-          for (const sub of subsequent) {
-            if (sub.scheduled_time) {
-              const prev = new Date(sub.scheduled_time)
-              const shifted = new Date(prev.getTime() + delayInput * 60000)
-              await timelineService.update(sub.id, {
-                scheduled_time: shifted.toISOString(),
-                delay_minutes: (sub.delay_minutes || 0) + delayInput,
-              })
-            }
-          }
-        }
-      }
-
-      toast({
-        title: `+${delayInput}m de atraso registrado`,
-        description: recalcNext ? 'Próximas etapas recalculadas!' : '',
-      })
-      setIsDelayModalOpen(false)
-      loadData()
-    } catch (_) {
-      toast({ title: 'Erro ao registrar atraso', variant: 'destructive' })
-    }
-  }
-
-  // Send Alert from Live
-  const handleSendLiveAlert = async (e: React.FormEvent) => {
+  // Create Occurrence
+  const handleCreateOccurrence = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!eventId || !alertMsg.trim()) return
+    if (!eventId || !occDesc.trim()) return
+    setIsSubmittingOcc(true)
     try {
-      await alertService.create({
+      const created = await occurrenceService.create({
         event_id: eventId,
-        target_type: targetTeamId ? 'EQUIPE' : 'TODOS',
-        target_team_id: targetTeamId || undefined,
-        message: alertMsg,
-        is_resolved: false,
+        category: occCategory,
+        description: occDesc,
+        responsible: occResp,
+        solution: occSol,
       })
-      toast({
-        title: 'Alerta disparado!',
-        description: 'Enviado com sucesso para a equipe.',
+      await auditService.log({
+        event_id: eventId,
+        actor_name: ROLE_CONFIGS[currentRole].label,
+        actor_role: currentRole,
+        action: 'OCORRENCIA_CRIADA',
+        target_entity: 'occurrences',
+        target_id: created.id,
+        details: `Categoria: ${occCategory}. Responsável: ${occResp}. Descrição: ${occDesc}`,
       })
-      setIsAlertModalOpen(false)
-      setAlertMsg('')
-      setTargetTeamId('')
+      toast({ title: 'Ocorrência registrada com sucesso!' })
+      setIsNewOccOpen(false)
+      setOccDesc('')
+      setOccSol('')
       loadData()
     } catch (_) {
-      toast({ title: 'Erro ao enviar alerta', variant: 'destructive' })
+      toast({ title: 'Erro ao criar ocorrência', variant: 'destructive' })
+    } finally {
+      setIsSubmittingOcc(false)
     }
   }
 
-  // Mark an acknowledgement for an alert (operational confirmation)
-  const handleConfirmAlertAck = async (alertId: string, status: 'RECEBIDO' | 'PRONTO') => {
+  // Resolve Occurrence
+  const handleResolveOccurrence = async () => {
+    if (!eventId || !resolvingOcc || !solutionText.trim()) return
     try {
-      await alertService.acknowledge(alertId, status)
-      toast({ title: `Status da equipe atualizado: ${status} ✓` })
+      await occurrenceService.update(resolvingOcc.id, {
+        solution: solutionText,
+      })
+      await auditService.log({
+        event_id: eventId,
+        actor_name: ROLE_CONFIGS[currentRole].label,
+        actor_role: currentRole,
+        action: 'OCORRENCIA_RESOLVIDA',
+        target_entity: 'occurrences',
+        target_id: resolvingOcc.id,
+        details: `Solução aplicada: ${solutionText}`,
+      })
+      toast({ title: 'Ocorrência marcada como resolvida!' })
+      setResolvingOcc(null)
+      setSolutionText('')
       loadData()
     } catch (_) {
-      toast({ title: 'Erro ao confirmar', variant: 'destructive' })
+      toast({ title: 'Erro ao resolver ocorrência', variant: 'destructive' })
     }
   }
 
-  // Operational readiness calculations
-  // Map of team readiness based on acknowledgements of latest alerts
-  const teamReadiness = useMemo(() => {
-    return teams.map((team) => {
-      // Find latest alert targeted to this team or to all
-      const teamAlerts = alerts.filter(
-        (a) => a.target_team_id === team.id || a.target_type === 'TODOS',
-      )
-      if (teamAlerts.length === 0) {
-        return { team, status: 'PRONTO' as const }
-      }
-      const latest = teamAlerts[0]
-      const ack = acks.find((ac) => ac.alert_id === latest.id)
-      if (!ack) return { team, status: 'AGUARDANDO' as const }
-      return { team, status: ack.status }
-    })
-  }, [teams, alerts, acks])
-
-  // Guest counters
-  const totalGuests = guests.length
-  const presentCount = guests.filter((g) => g.status === 'PRESENTE').length
+  // Send WhatsApp Broadcast to leaders
+  const handleSendBroadcast = async () => {
+    if (!eventId || !broadcastMessage.trim()) return
+    setIsSendingBroadcast(true)
+    try {
+      await whatsappService.sendSimulated({
+        event_id: eventId,
+        recipient_name: `Líderes de Equipe (${broadcastTarget})`,
+        recipient_phone: '(11) 98888-7777',
+        recipient_role: 'Coordenação',
+        category: 'ALERTA_EQUIPE',
+        message: `COMUNICADO GERAL HUGO CERIMONIAL: ${broadcastMessage}`,
+      })
+      await auditService.log({
+        event_id: eventId,
+        actor_name: ROLE_CONFIGS[currentRole].label,
+        actor_role: currentRole,
+        action: 'COMUNICADO_WHATSAPP_DISPARADO',
+        target_entity: 'whatsapp_messages',
+        details: broadcastMessage,
+      })
+      toast({ title: 'Comunicado despachado via WhatsApp simulado!' })
+      setIsBroadcastOpen(false)
+      setBroadcastMessage('')
+      loadData()
+    } catch (_) {
+      toast({ title: 'Erro ao disparar comunicado', variant: 'destructive' })
+    } finally {
+      setIsSendingBroadcast(false)
+    }
+  }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6 space-y-5 pb-28">
-      {/* Live Header with Pulsing Beacon */}
-      <div className="bg-[#1C1A17] text-white p-4 sm:p-5 rounded-2xl shadow-xl border border-[#332E27] flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/40 text-red-500 flex items-center justify-center font-bold">
-            <Radio className="w-5 h-5 animate-pulse" />
+    <div className="max-w-[1400px] mx-auto px-4 py-4 sm:py-6 space-y-6 pb-24">
+      {/* Top Main Status Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping inline-block" />
+            <Clock className="w-4 h-4 text-red-500" /> Evento Ao Vivo — Festa dos Destaques 2026
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-widest font-bold text-red-400 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block" />
-                COMANDO AO VIVO
-              </span>
-              <span className="text-neutral-500 text-xs">•</span>
-              <span className="text-neutral-400 text-xs font-mono">
-                {currentTime.toLocaleTimeString('pt-BR')}
-              </span>
-            </div>
-            <h1 className="text-lg sm:text-xl font-serif font-bold text-white">
-              Central Operacional do Hugo
-            </h1>
-          </div>
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+            Centro de Operações em Tempo Real
+          </h1>
+          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+            Coordenação: Hugo Cerimonial (Líderes) & Renato Apoio (Equipes) • WhatsApp Integrado
+          </p>
         </div>
 
-        {/* Guest counter pill */}
-        <div className="bg-[#24211D] px-3.5 py-1.5 rounded-xl border border-[#3A342D] text-right">
-          <div className="text-[10px] uppercase font-bold text-[#C5A45F]">Presentes / Total</div>
-          <div className="text-base sm:text-lg font-bold text-white">
-            <span className="text-emerald-400">{presentCount}</span> / {totalGuests}
+        {/* ROLE SWITCHER SELECTOR (Requirement I: Cada função vê só o que precisa executar) */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="text-right sm:text-left">
+            <span className="text-[10px] uppercase font-bold text-[#6B6356] block">
+              Visão por Função Ativa:
+            </span>
+            <Select value={currentRole} onValueChange={(v) => setCurrentRole(v as OperationalRole)}>
+              <SelectTrigger className="w-full sm:w-[280px] h-10 bg-white border-2 border-[#C5A45F] text-xs font-bold text-[#1C1A17]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(ROLE_CONFIGS).map(([k, cfg]) => (
+                  <SelectItem key={k} value={k}>
+                    {cfg.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
+          <Button
+            onClick={() => setIsBroadcastOpen(true)}
+            className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-bold text-xs h-10 gap-1.5 border border-[#3D3833] shadow"
+          >
+            <Send className="w-4 h-4" /> Disparar WhatsApp Geral
+          </Button>
         </div>
       </div>
 
-      {/* Main Focus: AGORA vs PRÓXIMO */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* AGORA Section */}
-        <Card className="bg-[#1C1A17] text-white border-2 border-[#C5A45F] shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#C5A45F]/10 rounded-full blur-2xl pointer-events-none" />
+      {/* Role Context Chip */}
+      <div className="bg-[#1C1A17] text-white p-3 rounded-xl border border-[#332E27] flex items-center justify-between text-xs">
+        <div className="flex items-center gap-2">
+          <Badge className={ROLE_CONFIGS[currentRole].badge}>
+            {ROLE_CONFIGS[currentRole].label}
+          </Badge>
+          <span className="text-neutral-300">
+            Foco Operacional: <strong>{ROLE_CONFIGS[currentRole].focus}</strong>
+          </span>
+        </div>
+        <span className="text-[11px] text-[#C5A45F] font-semibold hidden sm:inline">
+          Modo Operador Ativo
+        </span>
+      </div>
 
-          <CardHeader className="p-5 pb-2">
+      {/* THREE PILLAR PANELS: TIMELINE / HONOREES / BUFFET */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Pillar 1: Programação Atual & Próxima Atividade */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm flex flex-col justify-between">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                AGORA NO PALCO
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356]">
+                CRONOGRAMA DO PALCO
               </span>
-              <span className="text-xs font-serif font-bold text-[#C5A45F]">
-                {currentItem?.scheduled_time
-                  ? new Date(currentItem.scheduled_time).toLocaleTimeString('pt-BR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '19:00'}
-              </span>
+              <Badge className="bg-emerald-600 text-white text-[10px] font-bold animate-pulse">
+                EM ANDAMENTO
+              </Badge>
             </div>
-            <CardTitle className="text-xl sm:text-2xl font-serif font-bold text-white mt-1">
-              {currentItem?.title || 'Recepção dos Convidados'}
+            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] mt-1">
+              {currentTimelineItem ? currentTimelineItem.title : 'Recepção dos Convidados'}
             </CardTitle>
-            <p className="text-xs text-neutral-300 mt-1 line-clamp-2">
-              {currentItem?.description || 'Acolhimento institucional e direcionamento às mesas.'}
-            </p>
+            <CardDescription className="text-xs">
+              Horário previsto: {currentTimelineItem?.scheduled_time || '19:00'} • Responsável:{' '}
+              {currentTimelineItem?.responsibles || 'Hugo Cerimonial'}
+            </CardDescription>
           </CardHeader>
+          <CardContent className="p-4 space-y-3">
+            <p className="text-xs text-neutral-600 bg-neutral-50 p-2.5 rounded-xl border border-neutral-200">
+              {currentTimelineItem?.description ||
+                'Entrada musical, recepção com espumante no foyer e direcionamento às 20 mesas.'}
+            </p>
 
-          <CardContent className="p-5 pt-3 space-y-3">
-            {currentItem?.responsibles && (
-              <div className="text-xs text-neutral-300 bg-[#26231F] p-2.5 rounded-lg border border-[#3A342D]">
-                <strong className="text-[#C5A45F]">Responsáveis:</strong> {currentItem.responsibles}
+            {nextTimelineItem && (
+              <div className="pt-2 border-t border-neutral-100">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356] block">
+                  PRÓXIMA ATIVIDADE PROGRAMADA:
+                </span>
+                <div className="font-serif font-bold text-sm text-[#1C1A17] mt-0.5">
+                  {nextTimelineItem.title} ({nextTimelineItem.scheduled_time})
+                </div>
               </div>
             )}
-
-            {/* Quick in-card stage control */}
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <Button
-                onClick={handleCompleteCurrent}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 text-xs sm:text-sm gap-1.5 shadow"
-              >
-                <CheckCircle2 className="w-4 h-4" /> Concluir Etapa
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsDelayModalOpen(true)}
-                className="bg-[#24211D] border-red-500/40 text-red-400 hover:bg-red-950/30 hover:text-red-300 font-semibold h-12 text-xs sm:text-sm gap-1.5"
-              >
-                <AlertTriangle className="w-4 h-4" /> Atrasar Minutos
-              </Button>
-            </div>
           </CardContent>
+          <div className="p-4 pt-0">
+            <Link to={`/events/${eventId}/timeline`}>
+              <Button variant="outline" className="w-full text-xs h-8 border-neutral-300">
+                Abrir Roteiro Completo do Cerimonial
+              </Button>
+            </Link>
+          </div>
         </Card>
 
-        {/* PRÓXIMO Section with Countdown */}
-        <Card className="bg-white border-2 border-neutral-200 shadow-md">
-          <CardHeader className="p-5 pb-2">
+        {/* Pillar 2: Próximos Homenageados */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm flex flex-col justify-between">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
-                PRÓXIMO MOMENTO
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356]">
+                HOMENAGEADOS EM DESTAQUE
               </span>
-              <span className="text-xs font-semibold text-[#6B6356]">
-                {nextItem?.scheduled_time
-                  ? new Date(nextItem.scheduled_time).toLocaleTimeString('pt-BR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '--:--'}
-              </span>
+              <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold">
+                30 Homenagens
+              </Badge>
             </div>
-            <CardTitle className="text-lg sm:text-xl font-serif font-bold text-[#1C1A17] mt-1">
-              {nextItem?.title || 'Sem próxima etapa'}
+            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] mt-1 flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-[#C5A45F]" />
+              {onStageHonoree ? `No Palco: ${onStageHonoree.name}` : 'Preparando Palco'}
             </CardTitle>
-            <p className="text-xs text-[#6B6356] mt-1 line-clamp-2">
-              {nextItem?.description || 'Aguardando próxima definição da programação.'}
-            </p>
+            <CardDescription className="text-xs">
+              {onStageHonoree
+                ? `Ordem #${onStageHonoree.tribute_order} • Acompanhante: ${onStageHonoree.escort_name || 'Sim'}`
+                : 'Cerimônia de premiação prestes a iniciar'}
+            </CardDescription>
           </CardHeader>
-
-          <CardContent className="p-5 pt-3 space-y-3">
-            {/* Countdown Clock Display */}
-            <div className="bg-[#F8F7F4] border border-neutral-200 rounded-xl p-3 text-center">
-              <div className="text-[10px] uppercase font-bold tracking-wider text-[#6B6356]">
-                Contagem Regressiva para Início
-              </div>
-              <div className="text-3xl sm:text-4xl font-mono font-bold text-[#1C1A17] mt-0.5">
-                {countdownText}
-              </div>
+          <CardContent className="p-4 space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356] block">
+              Próximos na Fila de Chamada:
+            </span>
+            <div className="space-y-1.5">
+              {upcomingHonorees.map((uh) => (
+                <div
+                  key={uh.id}
+                  className="flex items-center justify-between p-2 rounded-lg bg-neutral-50 border border-neutral-200 text-xs"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#1C1A17] text-[#C5A45F] text-[10px] font-bold flex items-center justify-center">
+                      {uh.tribute_order}
+                    </span>
+                    <span className="font-semibold text-[#1C1A17]">{uh.name}</span>
+                  </div>
+                  <Badge className="text-[9px] bg-neutral-200 text-neutral-800">
+                    {uh.operational_state || 'AGUARDANDO'}
+                  </Badge>
+                </div>
+              ))}
             </div>
-
-            <Button
-              onClick={() => {
-                setAlertMsg(
-                  `ATENÇÃO: Momento "${nextItem?.title || ''}" se aproxima. Equipes prontas!`,
-                )
-                setIsAlertModalOpen(true)
-              }}
-              className="w-full bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold h-11 text-xs gap-1.5"
-            >
-              <BellRing className="w-4 h-4" /> Avisar Equipes deste Momento
-            </Button>
           </CardContent>
+          <div className="p-4 pt-0">
+            <Link to={`/events/${eventId}/honorees`}>
+              <Button variant="outline" className="w-full text-xs h-8 border-neutral-300">
+                Gerenciar Painel dos 30 Homenageados
+              </Button>
+            </Link>
+          </div>
+        </Card>
+
+        {/* Pillar 3: Liberação do Buffet */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm flex flex-col justify-between">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6356]">
+                BUFFET GASTRONÔMICO
+              </span>
+              <Badge className="bg-indigo-100 text-indigo-900 border-indigo-300 text-[10px] font-bold">
+                Ondas de 2-3 Mesas
+              </Badge>
+            </div>
+            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] mt-1 flex items-center gap-1.5">
+              <Utensils className="w-4 h-4 text-[#C5A45F]" />
+              {latestWave
+                ? `Última Onda: ${latestWave.table_names}`
+                : 'Aguardando Início do Buffet'}
+            </CardTitle>
+            <CardDescription className="text-xs">
+              {latestWave
+                ? `Liberado às ${new Date(latestWave.released_at).toLocaleTimeString('pt-BR')} por ${latestWave.operator}`
+                : 'Programado para 20:30'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2 text-xs">
+            <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+              <span className="font-semibold text-neutral-800 block">Status no Telão LED:</span>
+              <span className="text-emerald-700 font-bold">
+                {latestWave?.display_on_screen
+                  ? '✓ Projetando no Telão Principal'
+                  : 'Aguardando ativação'}
+              </span>
+            </div>
+            <div className="text-[11px] text-neutral-500">
+              WhatsApp automático despachado em lote para os convidados das mesas chamadas.
+            </div>
+          </CardContent>
+          <div className="p-4 pt-0">
+            <Link to={`/events/${eventId}/buffet`}>
+              <Button className="w-full text-xs h-8 bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold">
+                Liberar Próxima Onda de Mesas
+              </Button>
+            </Link>
+          </div>
         </Card>
       </div>
 
-      {/* Operational Confirmation: Painel do Hugo (Readiness Widget) */}
-      <Card className="bg-white border-neutral-200 shadow-sm">
-        <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-base font-serif font-bold text-[#1C1A17] flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-700" />
-              Confirmação Operacional das Equipes
-            </CardTitle>
-            <p className="text-xs text-[#6B6356] mt-0.5">
-              Hugo: Comunicação vira confirmação. Veja quem já está pronto para o momento.
-            </p>
-          </div>
-          <Button
-            size="sm"
-            onClick={() => setIsAlertModalOpen(true)}
-            className="bg-[#1C1A17] text-[#C5A45F] hover:bg-[#282521] text-xs h-8 gap-1"
-          >
-            <BellRing className="w-3.5 h-3.5" /> Novo Alerta
-          </Button>
-        </CardHeader>
-
-        <CardContent className="p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {teamReadiness.slice(0, 8).map(({ team, status }) => {
-              const isReady = status === 'PRONTO'
-              const isReceived = status === 'RECEBIDO'
-              const isWaiting = status === 'AGUARDANDO'
+      {/* OCORRÊNCIAS EM TEMPO REAL & HISTÓRICO DE AUDITORIA (Requirement K & M) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Ocorrências com resolução */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-base font-serif font-bold text-[#1C1A17] flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                Ocorrências de Salão & Resoluções
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Registre imprevistos com setor, responsável e solução tomada
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setIsNewOccOpen(true)}
+              className="bg-[#1C1A17] hover:bg-[#282521] text-[#C5A45F] font-bold text-xs h-8 gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" /> Registrar Ocorrência
+            </Button>
+          </CardHeader>
+          <CardContent className="p-4 space-y-3 max-h-[350px] overflow-y-auto">
+            {occurrences.map((occ) => {
+              const isResolved = !!occ.solution && occ.solution.trim().length > 0
 
               return (
                 <div
-                  key={team.id}
-                  className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
-                    isReady
-                      ? 'bg-emerald-50/70 border-emerald-300 text-emerald-900'
-                      : isReceived
-                        ? 'bg-blue-50/70 border-blue-300 text-blue-900'
-                        : 'bg-amber-50/70 border-amber-300 text-amber-900'
+                  key={occ.id}
+                  className={`p-3.5 rounded-xl border-2 transition-all space-y-2 ${
+                    isResolved
+                      ? 'border-neutral-200 bg-neutral-50/70'
+                      : 'border-red-400 bg-red-50/20'
                   }`}
                 >
-                  <span className="font-serif font-bold text-xs truncate">{team.name}</span>
-                  <div className="flex items-center justify-between mt-2 pt-1 border-t border-black/5 text-[10px] font-bold">
-                    <span>{isReady ? 'PRONTO ✓' : isReceived ? 'RECEBIDO' : 'AGUARDANDO ⚠'}</span>
-                    {/* Toggle button to simulate or confirm readiness */}
-                    <button
-                      onClick={() => {
-                        const targetAlert = alerts.find(
-                          (a) => a.target_team_id === team.id || a.target_type === 'TODOS',
-                        )
-                        if (targetAlert) {
-                          handleConfirmAlertAck(targetAlert.id, isReady ? 'RECEBIDO' : 'PRONTO')
-                        } else {
-                          toast({ title: `Equipe ${team.name} confirmada!` })
-                        }
-                      }}
-                      className="opacity-70 hover:opacity-100 underline"
-                      title="Alternar confirmação"
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-[#1C1A17] text-[#C5A45F] text-[9px]">
+                          {occ.category}
+                        </Badge>
+                        <span className="text-xs font-bold text-[#1C1A17]">{occ.description}</span>
+                      </div>
+                      <div className="text-[11px] text-neutral-500 mt-1">
+                        Responsável: <strong>{occ.responsible}</strong>
+                      </div>
+                    </div>
+
+                    <Badge
+                      className={`text-[9px] font-bold shrink-0 ${
+                        isResolved
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-red-600 text-white animate-pulse'
+                      }`}
                     >
-                      {isReady ? 'Revisar' : 'Confirmar'}
-                    </button>
+                      {isResolved ? 'RESOLVIDA' : 'PENDENTE'}
+                    </Badge>
                   </div>
+
+                  {isResolved ? (
+                    <div className="text-xs text-emerald-800 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
+                      <strong>Solução Adotada:</strong> {occ.solution}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setResolvingOcc(occ)
+                          setSolutionText('')
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-7 px-3"
+                      >
+                        ✓ Registrar Solução
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )
             })}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Active Alerts Feed */}
-      <Card className="bg-white border-neutral-200 shadow-sm">
-        <CardHeader className="p-4 pb-2 border-b border-neutral-100">
-          <CardTitle className="text-sm font-serif font-bold text-[#1C1A17] flex items-center gap-2">
-            <BellRing className="w-4 h-4 text-[#C5A45F]" />
-            Feed de Alertas e Instruções em Tempo Real
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 space-y-2">
-          {alerts.length === 0 ? (
-            <p className="text-xs text-neutral-400">Nenhum alerta recente emitido.</p>
-          ) : (
-            alerts.slice(0, 4).map((al) => (
+        {/* Audit Log / Histórico de Auditoria */}
+        <Card className="bg-white border-2 border-neutral-200 shadow-sm">
+          <CardHeader className="p-4 pb-2 border-b border-neutral-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-base font-serif font-bold text-[#1C1A17] flex items-center gap-2">
+                <History className="w-4 h-4 text-[#C5A45F]" />
+                Histórico de Auditoria Operacional
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Rastreamento completo: quem executou, horário, ação e entidade alvo
+              </CardDescription>
+            </div>
+            <Badge className="bg-neutral-100 text-neutral-800 text-[10px]">
+              {auditLogs.length} registros
+            </Badge>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2.5 max-h-[350px] overflow-y-auto font-mono text-xs">
+            {auditLogs.map((log) => (
               <div
-                key={al.id}
-                className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 border border-neutral-200 text-xs"
+                key={log.id}
+                className="p-2.5 rounded-lg bg-neutral-50 border border-neutral-200 space-y-1"
               >
-                <div className="flex items-start gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-[#C5A45F] mt-1.5 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-[#1C1A17]">{al.message}</span>
-                    <div className="text-[10px] text-[#6B6356] mt-0.5">
-                      Destino:{' '}
-                      <strong>{al.expand?.target_team_id?.name || 'TODAS AS EQUIPES'}</strong> •{' '}
-                      {new Date(al.created).toLocaleTimeString('pt-BR')}
-                    </div>
-                  </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <strong className="text-[#1C1A17]">{log.actor_name}</strong>
+                  <span className="text-neutral-400">
+                    {log.timestamp ? new Date(log.timestamp).toLocaleTimeString('pt-BR') : 'Agora'}
+                  </span>
                 </div>
-
-                <div className="flex items-center gap-1.5 shrink-0 ml-3">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleConfirmAlertAck(al.id, 'RECEBIDO')}
-                    className="text-[11px] h-7 px-2 border-blue-300 text-blue-800 hover:bg-blue-50"
-                  >
-                    Recebido
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => handleConfirmAlertAck(al.id, 'PRONTO')}
-                    className="text-[11px] h-7 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                  >
-                    Pronto ✓
-                  </Button>
-                </div>
+                <div className="text-[#C5A45F] font-bold text-[10px]">{log.action}</div>
+                <div className="text-neutral-600 text-[11px] font-sans">{log.details}</div>
               </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Large Thumb-Reach Bottom Action Buttons (Sticky above bottom nav) */}
-      <div className="fixed bottom-14 lg:bottom-4 left-0 right-0 z-30 px-4 max-w-4xl mx-auto pointer-events-none">
-        <div className="bg-[#1C1A17]/95 backdrop-blur border border-[#3D3833] p-2.5 rounded-2xl shadow-2xl flex items-center justify-between gap-2 pointer-events-auto">
-          <Button
-            onClick={handleCompleteCurrent}
-            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 text-xs sm:text-sm gap-1.5 shadow"
-          >
-            <CheckCircle2 className="w-4 h-4" /> Concluir Etapa
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => setIsDelayModalOpen(true)}
-            className="bg-[#26231F] border-red-500/50 text-red-300 hover:bg-red-950/40 font-bold h-12 text-xs sm:text-sm gap-1.5"
-          >
-            <AlertTriangle className="w-4 h-4 text-red-400" /> Atrasar
-          </Button>
-
-          <Button
-            onClick={() => setIsAlertModalOpen(true)}
-            className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold h-12 text-xs sm:text-sm gap-1.5 shadow"
-          >
-            <BellRing className="w-4 h-4" /> Avisar Equipes
-          </Button>
-
-          <Link to={`/app/${eventId}/checkin`} className="hidden sm:inline-block">
-            <Button
-              variant="outline"
-              className="bg-[#26231F] border-neutral-700 text-neutral-200 hover:bg-neutral-800 h-12 text-xs"
-            >
-              <Users className="w-4 h-4" />
-            </Button>
-          </Link>
-          <Link to={`/app/${eventId}/tables`} className="hidden sm:inline-block">
-            <Button
-              variant="outline"
-              className="bg-[#26231F] border-neutral-700 text-neutral-200 hover:bg-neutral-800 h-12 text-xs"
-            >
-              <Grid className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Delay Modal */}
-      <Dialog open={isDelayModalOpen} onOpenChange={setIsDelayModalOpen}>
-        <DialogContent className="sm:max-w-[440px] bg-white">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-xl text-red-900 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" /> Registrar Atraso Operacional
-            </DialogTitle>
-            <DialogDescription>
-              Ajuste o cronômetro do Hugo e recalcule os próximos momentos da cerimônia.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-3 text-sm">
-            <div className="space-y-2">
-              <Label htmlFor="live-delay">Minutos de atraso:</Label>
-              <Input
-                id="live-delay"
-                type="number"
-                min={1}
-                value={delayInput}
-                onChange={(e) => setDelayInput(parseInt(e.target.value) || 0)}
-                className="h-12 font-bold text-xl"
-              />
-              <div className="flex gap-2">
-                {[5, 10, 15, 20].map((m) => (
-                  <Button
-                    key={m}
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDelayInput(m)}
-                    className="flex-1 text-xs h-9"
-                  >
-                    +{m} min
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 pt-2 border-t border-neutral-100">
-              <input
-                type="checkbox"
-                id="live-recalc"
-                checked={recalcNext}
-                onChange={(e) => setRecalcNext(e.target.checked)}
-                className="mt-1 rounded text-[#C5A45F]"
-              />
-              <label htmlFor="live-recalc" className="text-xs text-neutral-800 cursor-pointer">
-                <strong>Recalcular automaticamente</strong> os horários dos momentos seguintes (+
-                {delayInput}m).
-              </label>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDelayModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleApplyLiveDelay}
-              className="bg-red-700 hover:bg-red-800 text-white font-semibold"
-            >
-              Aplicar no Ao Vivo
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Broadcast Alert Modal */}
-      <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
-        <DialogContent className="sm:max-w-[460px] bg-white">
-          <form onSubmit={handleSendLiveAlert}>
+      {/* NEW OCCURRENCE MODAL */}
+      <Dialog open={isNewOccOpen} onOpenChange={setIsNewOccOpen}>
+        <DialogContent className="sm:max-w-[480px] bg-white">
+          <form onSubmit={handleCreateOccurrence}>
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl flex items-center gap-2">
-                <BellRing className="w-5 h-5 text-[#C5A45F]" /> Enviar Ordem / Alerta
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-amber-900">
+                <AlertTriangle className="w-5 h-5 text-amber-600" /> Registrar Nova Ocorrência
               </DialogTitle>
-              <DialogDescription>
-                Transmita uma orientação imediata para as equipes selecionadas.
+              <DialogDescription className="text-xs">
+                Fica registrada no log de auditoria com atribuição imediata ao responsável.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-3 text-sm">
-              <div className="space-y-2">
-                <Label htmlFor="live-alert-team">Equipe Alvo:</Label>
-                <Select value={targetTeamId} onValueChange={setTargetTeamId}>
-                  <SelectTrigger id="live-alert-team">
-                    <SelectValue placeholder="Todas as Equipes (Geral)" />
+            <div className="space-y-3 py-2 text-xs">
+              <div className="space-y-1">
+                <Label htmlFor="occ-cat">Categoria:</Label>
+                <Select
+                  value={occCategory}
+                  onValueChange={(v) => setOccCategory(v as OccurrenceRecord['category'])}
+                >
+                  <SelectTrigger id="occ-cat" className="h-9">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas as Equipes (Geral)</SelectItem>
-                    {teams.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="MESA">Mesa / Cadeiras</SelectItem>
+                    <SelectItem value="CONVIDADO">Convidado / Recepção</SelectItem>
+                    <SelectItem value="BUFFET">Buffet / Restrição Alimentar</SelectItem>
+                    <SelectItem value="PROTOCOLO">Protocolo / Palco</SelectItem>
+                    <SelectItem value="EQUIPE">Equipe Operacional</SelectItem>
+                    <SelectItem value="FORNECEDOR">Fornecedor Externo</SelectItem>
+                    <SelectItem value="OUTRO">Outro Imprevisto</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="live-alert-msg">Mensagem da Ordem:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="occ-desc">Descrição do Ocorrido *</Label>
                 <Input
-                  id="live-alert-msg"
+                  id="occ-desc"
                   required
-                  placeholder="Ex: Homenagem em 10 minutos. Som e foto preparados!"
-                  value={alertMsg}
-                  onChange={(e) => setAlertMsg(e.target.value)}
+                  placeholder="Ex: Convidado solicitou trocar de mesa / Falha em microfone lapela..."
+                  value={occDesc}
+                  onChange={(e) => setOccDesc(e.target.value)}
+                  className="h-10"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="occ-resp">Responsável por Resolver:</Label>
+                <Input
+                  id="occ-resp"
+                  value={occResp}
+                  onChange={(e) => setOccResp(e.target.value)}
+                  className="h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="occ-sol">Ação Tomada / Solução (Opcional se já resolvida):</Label>
+                <Input
+                  id="occ-sol"
+                  placeholder="Se já resolvido, descreva aqui..."
+                  value={occSol}
+                  onChange={(e) => setOccSol(e.target.value)}
+                  className="h-9"
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsAlertModalOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setIsNewOccOpen(false)}>
                 Cancelar
               </Button>
               <Button
                 type="submit"
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+                disabled={isSubmittingOcc || !occDesc.trim()}
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold"
               >
-                Disparar Alerta
+                {isSubmittingOcc ? 'Salvando...' : 'Registrar Ocorrência'}
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* RESOLVE OCCURRENCE MODAL */}
+      {resolvingOcc && (
+        <Dialog open={!!resolvingOcc} onOpenChange={(open) => !open && setResolvingOcc(null)}>
+          <DialogContent className="sm:max-w-[480px] bg-white">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-900">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" /> Registrar Solução da
+                Ocorrência
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Ocorrência: <strong>{resolvingOcc.description}</strong>
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-2 text-xs">
+              <Label htmlFor="sol-text">Descreva a solução adotada e validada:</Label>
+              <Input
+                id="sol-text"
+                placeholder="Ex: Alocado na Mesa Reserva 01 com autorização de Hugo..."
+                value={solutionText}
+                onChange={(e) => setSolutionText(e.target.value)}
+                className="h-11"
+              />
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setResolvingOcc(null)}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleResolveOccurrence}
+                disabled={!solutionText.trim()}
+                className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
+              >
+                Salvar Solução e Concluir
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* BROADCAST WHATSAPP MODAL */}
+      <Dialog open={isBroadcastOpen} onOpenChange={setIsBroadcastOpen}>
+        <DialogContent className="sm:max-w-[500px] bg-white border-2 border-emerald-500">
+          <DialogHeader>
+            <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-2">
+              <Send className="w-6 h-6" />
+            </div>
+            <DialogTitle className="font-serif text-xl text-center text-emerald-950">
+              Comunicado WhatsApp em Massa para as Equipes
+            </DialogTitle>
+            <DialogDescription className="text-center text-xs">
+              Simulação de disparo aos líderes dos 68 profissionais envolvidos.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2 text-xs">
+            <div className="space-y-1">
+              <Label htmlFor="bc-target">Destinatários:</Label>
+              <Select value={broadcastTarget} onValueChange={setBroadcastTarget}>
+                <SelectTrigger id="bc-target" className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TODOS_LIDERES">
+                    Todos os Líderes de Equipe (68 prof.)
+                  </SelectItem>
+                  <SelectItem value="CERIMONIAL_PALCO">Apenas Palco e Cerimonial</SelectItem>
+                  <SelectItem value="BUFFET_GARCONS">Apenas Buffet e Garçons</SelectItem>
+                  <SelectItem value="RECEPCAO_SEGURANCA">Apenas Recepção e Segurança</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="bc-msg">Mensagem da Coordenação:</Label>
+              <textarea
+                id="bc-msg"
+                rows={3}
+                placeholder="Ex: Atenção líderes, início da cerimônia de premiação em 10 minutos. Todos nos seus postos..."
+                value={broadcastMessage}
+                onChange={(e) => setBroadcastMessage(e.target.value)}
+                className="w-full rounded-xl border border-neutral-300 p-2.5 text-xs focus:ring-2 focus:ring-[#C5A45F]"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBroadcastOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSendBroadcast}
+              disabled={isSendingBroadcast || !broadcastMessage.trim()}
+              className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
+            >
+              {isSendingBroadcast ? 'Disparando...' : 'Disparar Comunicado'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

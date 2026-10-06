@@ -1,12 +1,24 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { honoreeService, guestService, tableService } from '@/services/celebraService'
-import type { HonoreeRecord, GuestRecord, TableRecord } from '@/types/celebra'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useParams, Link } from 'react-router-dom'
+import {
+  honoreeService,
+  tableService,
+  guestService,
+  whatsappService,
+  auditService,
+} from '@/services/celebraService'
+import { useRealtime } from '@/hooks/use-realtime'
+import type {
+  HonoreeRecord,
+  TableRecord,
+  GuestRecord,
+  HonoreeOperationalState,
+} from '@/types/celebra'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +26,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
   Select,
@@ -23,43 +34,107 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
 import {
-  Search,
-  Plus,
   Award,
-  Phone,
-  MessageSquare,
-  Edit3,
-  Trash2,
-  Users,
-  AlertCircle,
   Sparkles,
+  Send,
+  CheckCircle2,
+  Clock,
+  Music,
+  Camera,
+  Tv,
+  Users,
+  Search,
+  Filter,
+  ArrowRight,
+  ShieldAlert,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+
+// 11 OPERATIONAL STATES (Requirement H)
+const OPERATIONAL_STATES: Record<
+  HonoreeOperationalState,
+  { label: string; badgeClass: string; desc: string }
+> = {
+  AGUARDANDO: {
+    label: 'Aguardando',
+    badgeClass: 'bg-neutral-200 text-neutral-800',
+    desc: 'Na mesa aguardando programação',
+  },
+  AVISADO: {
+    label: 'Avisado',
+    badgeClass: 'bg-blue-100 text-blue-900 border-blue-300',
+    desc: 'Notificação enviada por WhatsApp',
+  },
+  CONFIRMOU_RECEBIMENTO: {
+    label: 'Confirmou Recebimento',
+    badgeClass: 'bg-cyan-100 text-cyan-900 border-cyan-300',
+    desc: 'Homenageado ciente de que será o próximo',
+  },
+  EM_PREPARACAO: {
+    label: 'Em Preparação',
+    badgeClass: 'bg-purple-100 text-purple-900 border-purple-300',
+    desc: 'Condutor localizando e posicionando no recuo',
+  },
+  PROXIMO: {
+    label: 'Próximo a Subir',
+    badgeClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold animate-pulse',
+    desc: 'Pronto na lateral esquerda do palco',
+  },
+  CHAMADO: {
+    label: 'Chamado no Microfone',
+    badgeClass: 'bg-amber-500 text-white font-bold',
+    desc: 'Hugo anunciando o nome',
+  },
+  NO_PALCO: {
+    label: 'No Palco',
+    badgeClass: 'bg-emerald-600 text-white font-bold',
+    desc: 'Recebendo troféu e homenagens',
+  },
+  FOTOGRAFIA: {
+    label: 'Fotografia Oficial',
+    badgeClass: 'bg-indigo-600 text-white',
+    desc: 'Posando no backdrop com fotógrafo',
+  },
+  CONCLUIDO: {
+    label: 'Concluído',
+    badgeClass: 'bg-neutral-800 text-[#C5A45F]',
+    desc: 'Homenagem finalizada com sucesso',
+  },
+  AUSENTE: {
+    label: 'Ausente',
+    badgeClass: 'bg-red-600 text-white',
+    desc: 'Não compareceu ao evento',
+  },
+  EXCECAO: {
+    label: 'Exceção / Remanejado',
+    badgeClass: 'bg-red-800 text-white',
+    desc: 'Inversão ou atraso de ordem',
+  },
+}
 
 export default function Honorees() {
   const { eventId } = useParams<{ eventId: string }>()
   const [honorees, setHonorees] = useState<HonoreeRecord[]>([])
-  const [guests, setGuests] = useState<GuestRecord[]>([])
   const [tables, setTables] = useState<TableRecord[]>([])
+  const [guests, setGuests] = useState<GuestRecord[]>([])
   const [search, setSearch] = useState('')
+  const [filterState, setFilterState] = useState<string>('ALL')
   const [isLoading, setIsLoading] = useState(true)
 
-  // Dialog State
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingHonoree, setEditingHonoree] = useState<HonoreeRecord | null>(null)
-  const [selectedHonoreeDetail, setSelectedHonoreeDetail] = useState<HonoreeRecord | null>(null)
+  // Edit / Conduct Honoree Modal
+  const [selectedHonoree, setSelectedHonoree] = useState<HonoreeRecord | null>(null)
+  const [editState, setEditState] = useState<HonoreeOperationalState>('AGUARDANDO')
+  const [editEscort, setEditEscort] = useState('')
+  const [editConductor, setEditConductor] = useState('Renato Apoio')
+  const [editMusic, setEditMusic] = useState('')
+  const [editResources, setEditResources] = useState('')
+  const [isUpdating, setIsUpdating] = useState(false)
 
-  // Form State
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [whatsapp, setWhatsapp] = useState('')
-  const [observations, setObservations] = useState('')
-  const [status, setStatus] = useState<'CONFIRMADO' | 'PENDENTE'>('CONFIRMADO')
-  const [importantInfo, setImportantInfo] = useState('')
-  const [tributeOrder, setTributeOrder] = useState<number>(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // WhatsApp Alert Modal
+  const [wpModalHonoree, setWpModalHonoree] = useState<HonoreeRecord | null>(null)
+  const [wpMsg, setWpMsg] = useState('')
+  const [isSendingWp, setIsSendingWp] = useState(false)
 
   const { toast } = useToast()
 
@@ -67,20 +142,16 @@ export default function Honorees() {
     if (!eventId) return
     setIsLoading(true)
     try {
-      const [hList, gList, tList] = await Promise.all([
+      const [hList, tList, gList] = await Promise.all([
         honoreeService.list(eventId),
-        guestService.list(eventId),
         tableService.list(eventId),
+        guestService.list(eventId),
       ])
       setHonorees(hList)
-      setGuests(gList)
       setTables(tList)
+      setGuests(gList)
     } catch (_) {
-      toast({
-        title: 'Erro ao carregar homenageados',
-        description: 'Tente recarregar a página.',
-        variant: 'destructive',
-      })
+      toast({ title: 'Erro ao carregar homenageados', variant: 'destructive' })
     } finally {
       setIsLoading(false)
     }
@@ -90,451 +161,500 @@ export default function Honorees() {
     loadData()
   }, [eventId])
 
-  const openCreateDialog = () => {
-    setEditingHonoree(null)
-    setName('')
-    setPhone('')
-    setWhatsapp('')
-    setObservations('')
-    setStatus('CONFIRMADO')
-    setImportantInfo('')
-    setTributeOrder(honorees.length + 1)
-    setIsDialogOpen(true)
-  }
+  useRealtime<HonoreeRecord>('honorees', () => {
+    if (eventId)
+      honoreeService
+        .list(eventId)
+        .then(setHonorees)
+        .catch(() => {})
+  })
 
-  const openEditDialog = (h: HonoreeRecord) => {
-    setEditingHonoree(h)
-    setName(h.name)
-    setPhone(h.phone || '')
-    setWhatsapp(h.whatsapp || '')
-    setObservations(h.observations || '')
-    setStatus(h.status || 'CONFIRMADO')
-    setImportantInfo(h.important_info || '')
-    setTributeOrder(h.tribute_order || 1)
-    setIsDialogOpen(true)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!eventId || !name.trim()) return
-    setIsSubmitting(true)
+  // Recalculate automatic sequence notice (Requirement H: Mudanças na programação recalculam os próximos avisos automaticamente sem Hugo comunicar manualmente)
+  const handleAdvanceState = async (honoree: HonoreeRecord, nextState: HonoreeOperationalState) => {
+    if (!eventId) return
     try {
-      if (editingHonoree) {
-        await honoreeService.update(editingHonoree.id, {
-          name,
-          phone,
-          whatsapp,
-          observations,
-          status,
-          important_info: importantInfo,
-          tribute_order: tributeOrder,
-        })
-        toast({ title: 'Homenageado atualizado com sucesso!' })
-      } else {
-        await honoreeService.create({
-          event_id: eventId,
-          name,
-          phone,
-          whatsapp,
-          observations,
-          status,
-          important_info: importantInfo,
-          tribute_order: tributeOrder,
-        })
-        toast({ title: 'Homenageado cadastrado com sucesso!' })
-      }
-      setIsDialogOpen(false)
-      loadData()
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Falha ao salvar homenageado.'
-      toast({
-        title: 'Erro ao salvar',
-        description: msg,
-        variant: 'destructive',
+      await honoreeService.update(honoree.id, {
+        operational_state: nextState,
+        actual_time: nextState === 'NO_PALCO' ? new Date().toISOString() : undefined,
       })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Tem certeza que deseja remover "${name}"?`)) return
-    try {
-      await honoreeService.delete(id)
-      toast({ title: 'Homenageado removido.' })
+      // If this one is NO_PALCO, automatically advance the next in order to PROXIMO and dispatch WhatsApp
+      if (nextState === 'NO_PALCO') {
+        const nextOrder = (honoree.tribute_order || 0) + 1
+        const nextHonoree = honorees.find((h) => (h.tribute_order || 0) === nextOrder)
+        if (nextHonoree && nextHonoree.operational_state !== 'CONCLUIDO') {
+          await honoreeService.update(nextHonoree.id, {
+            operational_state: 'PROXIMO',
+          })
+          // Auto dispatch WhatsApp alert to next honoree
+          whatsappService
+            .sendSimulated({
+              event_id: eventId,
+              recipient_name: nextHonoree.name,
+              recipient_phone: nextHonoree.phone || '(11) 98765-0000',
+              recipient_role: 'Homenageado',
+              category: 'HOMENAGEADO_CHAMADA',
+              message: `Olá ${nextHonoree.name}! Você é o PRÓXIMO na ordem de homenagens da Festa dos Destaques 2026. O apoio ${nextHonoree.conductor_responsible || 'Renato'} já está a caminho da sua mesa para conduzi-lo ao palco.`,
+            })
+            .catch(() => {})
+        }
+      }
+
+      toast({
+        title: `Status de ${honoree.name} atualizado para: ${OPERATIONAL_STATES[nextState].label}`,
+      })
       loadData()
     } catch (_) {
-      toast({ title: 'Erro ao remover', variant: 'destructive' })
+      toast({ title: 'Erro ao atualizar status', variant: 'destructive' })
     }
   }
 
-  // Filtered list
+  // Save detailed honoree info
+  const handleSaveHonoree = async () => {
+    if (!selectedHonoree) return
+    setIsUpdating(true)
+    try {
+      await honoreeService.update(selectedHonoree.id, {
+        operational_state: editState,
+        escort_name: editEscort,
+        conductor_responsible: editConductor,
+        music_cue: editMusic,
+        stage_resources: editResources,
+      })
+      toast({ title: 'Dados do homenageado salvos com sucesso!' })
+      setSelectedHonoree(null)
+      loadData()
+    } catch (_) {
+      toast({ title: 'Erro ao salvar homenageado', variant: 'destructive' })
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  // Send WhatsApp manually
+  const handleSendManualWhatsApp = async () => {
+    if (!eventId || !wpModalHonoree) return
+    setIsSendingWp(true)
+    try {
+      await whatsappService.sendSimulated({
+        event_id: eventId,
+        recipient_name: wpModalHonoree.name,
+        recipient_phone: wpModalHonoree.phone || '(11) 99999-0000',
+        recipient_role: 'Homenageado',
+        category: 'HOMENAGEADO_CHAMADA',
+        message: wpMsg,
+      })
+      await honoreeService.update(wpModalHonoree.id, {
+        operational_state: 'AVISADO',
+      })
+      toast({
+        title: 'Mensagem enviada com sucesso!',
+        description: `Status alterado para "Avisado" automaticamente.`,
+      })
+      setWpModalHonoree(null)
+      setWpMsg('')
+      loadData()
+    } catch (_) {
+      toast({ title: 'Erro ao enviar WhatsApp', variant: 'destructive' })
+    } finally {
+      setIsSendingWp(false)
+    }
+  }
+
+  // Filtered Honorees
   const filteredHonorees = useMemo(() => {
     return honorees.filter((h) => {
-      const q = search.toLowerCase()
-      return (
-        h.name.toLowerCase().includes(q) ||
-        (h.important_info && h.important_info.toLowerCase().includes(q)) ||
-        (h.phone && h.phone.includes(q))
-      )
+      const matchSearch =
+        h.name.toLowerCase().includes(search.toLowerCase()) ||
+        (h.escort_name && h.escort_name.toLowerCase().includes(search.toLowerCase()))
+      const matchFilter =
+        filterState === 'ALL' || (h.operational_state || 'AGUARDANDO') === filterState
+      return matchSearch && matchFilter
     })
-  }, [honorees, search])
+  }, [honorees, search, filterState])
 
-  // Get table name for an honoree via their linked guests
-  const getHonoreeTable = (honoreeId: string) => {
-    const linked = guests.filter((g) => g.honoree_id === honoreeId && g.table_id)
-    if (linked.length > 0) {
-      const foundTable = tables.find((t) => t.id === linked[0].table_id)
-      return foundTable ? foundTable.name : 'Mesa alocada'
-    }
-    return 'Sem mesa definida'
-  }
+  const onStageHonoree = honorees.find((h) => h.operational_state === 'NO_PALCO')
+  const nextHonoree = honorees.find((h) => h.operational_state === 'PROXIMO')
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-6 lg:py-8 space-y-6">
-      {/* Header */}
+    <div className="max-w-[1400px] mx-auto px-4 py-4 sm:py-6 space-y-6 pb-24">
+      {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
-            <Award className="w-4 h-4" /> Gestão de Personalidades
+            <Award className="w-4 h-4" /> Cerimonial de Premiação & Protocolo
           </div>
-          <h1 className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-[#1C1A17]">
-            Homenageados ({honorees.length})
+          <h1 className="text-2xl lg:text-3xl font-serif font-bold text-[#1C1A17]">
+            Painel dos 30 Homenageados da Festa
           </h1>
-          <p className="text-sm text-[#6B6356] mt-1">
-            Cadastre, organize a ordem de homenagem e acompanhe observações críticas de cada um.
+          <p className="text-xs sm:text-sm text-[#6B6356] mt-0.5">
+            11 estados operacionais, recálculo automático de chamadas, condutores responsáveis e
+            trilhas musicais.
           </p>
         </div>
 
-        <Button
-          onClick={openCreateDialog}
-          className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-2 shadow-sm shrink-0"
-        >
-          <Plus className="w-4 h-4" /> Novo Homenageado
-        </Button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-neutral-400" />
-        <Input
-          placeholder="Pesquisar por nome, telefone ou observação importante..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 h-11 bg-white border-neutral-200 focus:border-[#C5A45F]"
-        />
-      </div>
-
-      {/* List / Cards */}
-      {isLoading ? (
-        <div className="flex justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C5A45F] border-t-transparent" />
+        {/* Live Stage Highlights */}
+        <div className="flex items-center gap-2">
+          {onStageHonoree && (
+            <Badge className="bg-emerald-600 text-white font-serif text-xs py-1.5 px-3">
+              No Palco Agora: #{onStageHonoree.tribute_order} {onStageHonoree.name}
+            </Badge>
+          )}
+          {nextHonoree && (
+            <Badge className="bg-amber-500 text-white font-serif text-xs py-1.5 px-3 animate-pulse">
+              Próximo: #{nextHonoree.tribute_order} {nextHonoree.name}
+            </Badge>
+          )}
         </div>
-      ) : filteredHonorees.length === 0 ? (
-        <Card className="text-center py-16 bg-white border-dashed">
-          <CardContent>
-            <Award className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-[#221E1A]">Nenhum homenageado encontrado.</p>
-            <p className="text-xs text-[#6B6356] mt-1">
-              Tente ajustar a busca ou adicionar um novo homenageado.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredHonorees.map((h) => {
-            const tableName = getHonoreeTable(h.id)
-            const linkedGuests = guests.filter((g) => g.honoree_id === h.id)
+      </div>
 
-            return (
-              <Card
-                key={h.id}
-                className="bg-white border-neutral-200 hover:border-[#C5A45F] transition-all shadow-sm flex flex-col justify-between"
-              >
-                <CardHeader className="p-4 pb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-[#1C1A17] text-[#C5A45F] flex items-center justify-center font-bold text-xs shrink-0">
-                        #{h.tribute_order || '—'}
-                      </div>
-                      <div>
-                        <CardTitle className="text-base font-serif font-bold text-[#1C1A17] line-clamp-1">
-                          {h.name}
-                        </CardTitle>
-                        <span className="text-xs font-medium text-[#C5A45F]">{tableName}</span>
+      {/* Control / Search Filters */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-neutral-200">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-3" />
+          <Input
+            placeholder="Buscar por nome do homenageado ou acompanhante..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-10 text-xs bg-white"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-[#6B6356]" />
+          <Select value={filterState} onValueChange={setFilterState}>
+            <SelectTrigger className="w-[200px] h-10 text-xs bg-white">
+              <SelectValue placeholder="Filtrar por estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos os Estados ({honorees.length})</SelectItem>
+              {Object.entries(OPERATIONAL_STATES).map(([k, cfg]) => (
+                <SelectItem key={k} value={k}>
+                  {cfg.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* 30 Honorees Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredHonorees.map((h) => {
+          const stKey = (h.operational_state || 'AGUARDANDO') as HonoreeOperationalState
+          const stateCfg = OPERATIONAL_STATES[stKey] || OPERATIONAL_STATES.AGUARDANDO
+          const assignedTable = tables.find((t) => t.id === h.table_id)
+          const isOnStage = stKey === 'NO_PALCO'
+          const isNext = stKey === 'PROXIMO'
+
+          return (
+            <div
+              key={h.id}
+              className={`rounded-2xl p-5 border-2 transition-all bg-white shadow-sm flex flex-col justify-between ${
+                isOnStage
+                  ? 'border-emerald-500 bg-emerald-50/20 ring-2 ring-emerald-500 shadow-md'
+                  : isNext
+                    ? 'border-amber-400 bg-amber-50/20 ring-2 ring-amber-400'
+                    : 'border-neutral-200 hover:border-[#C5A45F]'
+              }`}
+            >
+              <div>
+                {/* Header: Order badge + State Badge */}
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-full bg-[#1C1A17] text-[#C5A45F] font-serif font-bold text-sm flex items-center justify-center shrink-0">
+                      #{h.tribute_order || '•'}
+                    </span>
+                    <div>
+                      <h3 className="font-serif font-bold text-base text-[#1C1A17] leading-tight">
+                        {h.name}
+                      </h3>
+                      <div className="text-[11px] text-[#6B6356] mt-0.5">
+                        Mesa:{' '}
+                        <strong className="text-[#C5A45F]">
+                          {assignedTable?.name || 'Mesa 01'}
+                        </strong>
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] font-bold ${
-                        h.status === 'CONFIRMADO'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                          : 'bg-amber-50 text-amber-800 border-amber-300'
-                      }`}
-                    >
-                      {h.status || 'CONFIRMADO'}
-                    </Badge>
                   </div>
-                </CardHeader>
 
-                <CardContent className="p-4 pt-1 space-y-3">
-                  {/* Important Info warning pill */}
-                  {h.important_info && (
-                    <div className="bg-amber-50/70 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-900 flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                      <span className="line-clamp-2 leading-relaxed">{h.important_info}</span>
+                  <Badge className={`text-[10px] font-bold shrink-0 ${stateCfg.badgeClass}`}>
+                    {stateCfg.label}
+                  </Badge>
+                </div>
+
+                {/* Presentation & Details */}
+                <div className="space-y-2 text-xs py-2 border-t border-neutral-100">
+                  {h.escort_name && (
+                    <div className="text-neutral-600 flex items-center gap-1">
+                      <Users className="w-3.5 h-3.5 text-neutral-400" />
+                      <span>
+                        Acompanhante: <strong>{h.escort_name}</strong>
+                      </span>
                     </div>
                   )}
 
-                  <div className="text-xs text-[#6B6356] space-y-1">
-                    {h.whatsapp && (
-                      <div className="flex items-center gap-1.5">
-                        <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>WhatsApp: {h.whatsapp}</span>
-                      </div>
-                    )}
-                    {h.phone && !h.whatsapp && (
-                      <div className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-neutral-500" />
-                        <span>Tel: {h.phone}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1.5 pt-1">
-                      <Users className="w-3.5 h-3.5 text-[#C5A45F]" />
-                      <span>{linkedGuests.length} convidado(s) vinculado(s)</span>
-                    </div>
+                  <div className="text-neutral-600 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                    <span>
+                      Condutor: <strong>{h.conductor_responsible || 'Renato Apoio'}</strong>
+                    </span>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedHonoreeDetail(h)}
-                      className="text-xs text-[#6B6356] hover:text-[#1C1A17] p-0 h-auto font-medium"
-                    >
-                      Ver Detalhes
-                    </Button>
-
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEditDialog(h)}
-                        className="h-8 w-8 text-neutral-500 hover:text-black"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(h.id, h.name)}
-                        className="h-8 w-8 text-neutral-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                  {h.music_cue && (
+                    <div className="text-[11px] text-purple-900 bg-purple-50 p-1.5 rounded flex items-center gap-1.5">
+                      <Music className="w-3.5 h-3.5 text-purple-700" />
+                      <span>Trilha: {h.music_cue}</span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Detail Modal */}
-      {selectedHonoreeDetail && (
-        <Dialog
-          open={!!selectedHonoreeDetail}
-          onOpenChange={(open) => !open && setSelectedHonoreeDetail(null)}
-        >
-          <DialogContent className="sm:max-w-[500px] bg-white">
-            <DialogHeader>
-              <div className="flex items-center gap-2 text-xs font-bold text-[#C5A45F] uppercase">
-                <Sparkles className="w-3.5 h-3.5" /> Homenageado #
-                {selectedHonoreeDetail.tribute_order || '1'}
+                  )}
+                </div>
               </div>
-              <DialogTitle className="text-xl font-serif font-bold text-[#1C1A17]">
-                {selectedHonoreeDetail.name}
-              </DialogTitle>
+
+              {/* Action footer */}
+              <div className="pt-3 border-t border-neutral-100 space-y-2">
+                {/* Stepper buttons according to state */}
+                <div className="grid grid-cols-2 gap-2">
+                  {stKey === 'AGUARDANDO' && (
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setWpModalHonoree(h)
+                        setWpMsg(
+                          `Olá ${h.name}! Informamos que a sua homenagem na Festa dos Destaques 2026 está próxima. O apoio ${h.conductor_responsible || 'Renato'} irá localizá-lo em sua mesa (${assignedTable?.name || 'Mesa'}).`,
+                        )
+                      }}
+                      className="text-xs h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-1"
+                    >
+                      <Send className="w-3 h-3" /> [1] Avisar WhatsApp
+                    </Button>
+                  )}
+                  {stKey === 'AVISADO' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAdvanceState(h, 'CONFIRMOU_RECEBIMENTO')}
+                      className="text-xs h-8 bg-cyan-700 hover:bg-cyan-800 text-white font-bold"
+                    >
+                      [2] Confirmou Ciente
+                    </Button>
+                  )}
+                  {stKey === 'CONFIRMOU_RECEBIMENTO' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAdvanceState(h, 'EM_PREPARACAO')}
+                      className="text-xs h-8 bg-purple-700 hover:bg-purple-800 text-white font-bold"
+                    >
+                      [3] Em Preparação
+                    </Button>
+                  )}
+                  {stKey === 'EM_PREPARACAO' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAdvanceState(h, 'PROXIMO')}
+                      className="text-xs h-8 bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                    >
+                      [4] Chamar p/ Recuo
+                    </Button>
+                  )}
+                  {stKey === 'PROXIMO' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAdvanceState(h, 'NO_PALCO')}
+                      className="text-xs h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                    >
+                      [5] Subir ao Palco!
+                    </Button>
+                  )}
+                  {stKey === 'NO_PALCO' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAdvanceState(h, 'FOTOGRAFIA')}
+                      className="text-xs h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+                    >
+                      [6] Ir p/ Fotografia
+                    </Button>
+                  )}
+                  {stKey === 'FOTOGRAFIA' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAdvanceState(h, 'CONCLUIDO')}
+                      className="text-xs h-8 bg-neutral-800 hover:bg-neutral-900 text-white font-bold"
+                    >
+                      [7] Finalizar
+                    </Button>
+                  )}
+                  {stKey === 'CONCLUIDO' && (
+                    <div className="col-span-2 text-center text-xs text-emerald-700 font-semibold py-1">
+                      ✓ Homenagem Realizada
+                    </div>
+                  )}
+
+                  {/* Edit details button */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedHonoree(h)
+                      setEditState((h.operational_state || 'AGUARDANDO') as HonoreeOperationalState)
+                      setEditEscort(h.escort_name || '')
+                      setEditConductor(h.conductor_responsible || 'Renato Apoio')
+                      setEditMusic(h.music_cue || '')
+                      setEditResources(h.stage_resources || '')
+                    }}
+                    className={`text-xs h-8 border-neutral-300 font-medium ${
+                      stKey === 'CONCLUIDO' ? 'col-span-2' : ''
+                    }`}
+                  >
+                    Ficha / Recursos
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* EDIT HONOREE MODAL */}
+      {selectedHonoree && (
+        <Dialog open={!!selectedHonoree} onOpenChange={(open) => !open && setSelectedHonoree(null)}>
+          <DialogContent className="sm:max-w-[550px] bg-white">
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-[#1C1A17] text-[#C5A45F] font-serif font-bold text-xs flex items-center justify-center">
+                  #{selectedHonoree.tribute_order}
+                </span>
+                <DialogTitle className="font-serif text-xl">{selectedHonoree.name}</DialogTitle>
+              </div>
               <DialogDescription>
-                Mesa: {getHonoreeTable(selectedHonoreeDetail.id)}
+                Configuração operacional de palco, acompanhante, condutor e áudio.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-2 text-sm text-[#221E1A]">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6356] block">
-                  Informações Críticas / Protocolo
-                </span>
-                <p className="mt-1 bg-neutral-50 p-3 rounded-lg border border-neutral-200 leading-relaxed">
-                  {selectedHonoreeDetail.important_info ||
-                    'Nenhuma informação especial registrada.'}
-                </p>
+            <div className="space-y-4 py-2 text-xs">
+              <div className="space-y-1">
+                <Label htmlFor="h-state" className="font-bold">
+                  Estado Operacional Atual:
+                </Label>
+                <Select
+                  value={editState}
+                  onValueChange={(v) => setEditState(v as HonoreeOperationalState)}
+                >
+                  <SelectTrigger id="h-state" className="h-10 bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(OPERATIONAL_STATES).map(([k, cfg]) => (
+                      <SelectItem key={k} value={k}>
+                        {cfg.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {selectedHonoreeDetail.observations && (
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6356] block">
-                    Observações Internas
-                  </span>
-                  <p className="mt-1 text-xs text-[#6B6356]">
-                    {selectedHonoreeDetail.observations}
-                  </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="h-escort">Acompanhante:</Label>
+                  <Input
+                    id="h-escort"
+                    value={editEscort}
+                    onChange={(e) => setEditEscort(e.target.value)}
+                    className="h-9"
+                  />
                 </div>
-              )}
+                <div className="space-y-1">
+                  <Label htmlFor="h-cond">Condutor Responsável:</Label>
+                  <Input
+                    id="h-cond"
+                    value={editConductor}
+                    onChange={(e) => setEditConductor(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+              </div>
 
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6356] block mb-2">
-                  Convidados Vinculados (
-                  {guests.filter((g) => g.honoree_id === selectedHonoreeDetail.id).length})
-                </span>
-                <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                  {guests
-                    .filter((g) => g.honoree_id === selectedHonoreeDetail.id)
-                    .map((g) => (
-                      <div
-                        key={g.id}
-                        className="flex items-center justify-between p-2 rounded bg-neutral-50 border border-neutral-100 text-xs"
-                      >
-                        <span className="font-medium text-[#1C1A17]">{g.name}</span>
-                        <Badge variant="outline" className="text-[10px]">
-                          {g.status}
-                        </Badge>
-                      </div>
-                    ))}
-                </div>
+              <div className="space-y-1">
+                <Label htmlFor="h-music">Música / Deixa de Entrada:</Label>
+                <Input
+                  id="h-music"
+                  placeholder="Ex: Fanfarra Destaques Trilha 12"
+                  value={editMusic}
+                  onChange={(e) => setEditMusic(e.target.value)}
+                  className="h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="h-res">Recursos de Palco / Especial:</Label>
+                <Input
+                  id="h-res"
+                  placeholder="Ex: Rampa de acesso, microfone sem fio, slide no telão..."
+                  value={editResources}
+                  onChange={(e) => setEditResources(e.target.value)}
+                  className="h-9"
+                />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setSelectedHonoreeDetail(null)}>
-                Fechar
+              <Button variant="outline" onClick={() => setSelectedHonoree(null)}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSaveHonoree}
+                disabled={isUpdating}
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-bold"
+              >
+                {isUpdating ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white">
-          <form onSubmit={handleSubmit}>
+      {/* WHATSAPP MODAL FOR HONOREE */}
+      {wpModalHonoree && (
+        <Dialog open={!!wpModalHonoree} onOpenChange={(open) => !open && setWpModalHonoree(null)}>
+          <DialogContent className="sm:max-w-[480px] bg-white border-2 border-emerald-500">
             <DialogHeader>
-              <DialogTitle className="font-serif text-xl">
-                {editingHonoree ? 'Editar Homenageado' : 'Novo Homenageado'}
+              <DialogTitle className="font-serif text-xl flex items-center gap-2 text-emerald-950">
+                <Send className="w-5 h-5 text-emerald-600" /> Aviso de Chamada via WhatsApp
               </DialogTitle>
               <DialogDescription>
-                Preencha os dados da personalidade que será homenageada na festa.
+                Homenageado: <strong>{wpModalHonoree.name}</strong> • Ordem: #
+                {wpModalHonoree.tribute_order}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="h-name">Nome Completo *</Label>
-                <Input
-                  id="h-name"
-                  required
-                  placeholder="Ex: Mariana Oliveira"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="h-order">Ordem no Palco</Label>
-                  <Input
-                    id="h-order"
-                    type="number"
-                    min={1}
-                    value={tributeOrder}
-                    onChange={(e) => setTributeOrder(parseInt(e.target.value) || 1)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="h-status">Status</Label>
-                  <Select
-                    value={status}
-                    onValueChange={(val: 'CONFIRMADO' | 'PENDENTE') => setStatus(val)}
-                  >
-                    <SelectTrigger id="h-status">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
-                      <SelectItem value="PENDENTE">Pendente</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="h-phone">Telefone</Label>
-                  <Input
-                    id="h-phone"
-                    placeholder="(11) 99999-9999"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="h-whatsapp">WhatsApp</Label>
-                  <Input
-                    id="h-whatsapp"
-                    placeholder="(11) 99999-9999"
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="h-info" className="text-amber-900 font-semibold">
-                  Informações Importantes (Alergias, Mobilidade, Púlpito)
-                </Label>
-                <Textarea
-                  id="h-info"
-                  rows={2}
-                  placeholder="Ex: Não consome glúten. Sentar próxima à rampa de acesso."
-                  value={importantInfo}
-                  onChange={(e) => setImportantInfo(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="h-obs">Observações Gerais</Label>
-                <Textarea
-                  id="h-obs"
-                  rows={2}
-                  placeholder="Ex: Acompanhada de 4 familiares."
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                />
-              </div>
+            <div className="space-y-3 py-2 text-xs">
+              <Label htmlFor="h-wp-text">Mensagem para o Homenageado:</Label>
+              <textarea
+                id="h-wp-text"
+                rows={3}
+                value={wpMsg}
+                onChange={(e) => setWpMsg(e.target.value)}
+                className="w-full rounded-xl border border-neutral-300 p-2.5 text-xs focus:ring-2 focus:ring-[#C5A45F]"
+              />
+              <p className="text-[11px] text-[#6B6356]">
+                O envio será registrado no WhatsApp simulado e mudará o status para{' '}
+                <strong>"Avisado"</strong>.
+              </p>
             </div>
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-                disabled={isSubmitting}
-              >
+              <Button variant="outline" onClick={() => setWpModalHonoree(null)}>
                 Cancelar
               </Button>
               <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+                onClick={handleSendManualWhatsApp}
+                disabled={isSendingWp || !wpMsg.trim()}
+                className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
               >
-                {isSubmitting ? 'Salvando...' : 'Salvar Homenageado'}
+                {isSendingWp ? 'Enviando...' : 'Despachar WhatsApp'}
               </Button>
             </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

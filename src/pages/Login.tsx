@@ -17,7 +17,7 @@ import { Sparkles, ArrowRight, Lock, Mail } from 'lucide-react'
 
 export default function Login() {
   const [email, setEmail] = useState('danilorickes@gmail.com')
-  const [password, setPassword] = useState('Skip@Pass')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
@@ -116,12 +116,12 @@ export default function Login() {
 
               <div className="bg-[#1C1A17]/80 rounded-lg p-3 border border-[#3D3833] text-xs text-neutral-400">
                 <span className="text-[#C5A45F] font-semibold">
-                  Credencial de Demonstração Piloto:
+                  Acesso de Demonstração Operacional:
                 </span>
                 <br />
-                Login: <strong className="text-neutral-200">danilorickes@gmail.com</strong>
-                <br />
-                Senha: <strong className="text-neutral-200">Skip@Pass</strong>
+                Utilize a sua credencial cadastrada ou crie uma nova conta em "Criar conta". Para o
+                ambiente de homologação, utilize as credenciais fornecidas privadamente pela
+                coordenação da demonstração.
               </div>
             </CardContent>
 

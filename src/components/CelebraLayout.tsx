@@ -66,13 +66,19 @@ export default function CelebraLayout() {
   const navItems = eventId
     ? [
         { label: 'Central da Festa', to: `/app/${eventId}/dashboard`, icon: LayoutDashboard },
-        { label: 'Homenageados', to: `/app/${eventId}/honorees`, icon: Award },
-        { label: 'Convidados', to: `/app/${eventId}/guests`, icon: Users },
-        { label: 'Mesas', to: `/app/${eventId}/tables`, icon: Grid },
-        { label: 'Check-in', to: `/app/${eventId}/checkin`, icon: CheckCircle2 },
-        { label: 'Protocolo', to: `/app/${eventId}/timeline`, icon: Clock },
-        { label: 'Equipes & Staff', to: `/app/${eventId}/teams`, icon: ShieldCheck },
-        { label: 'Ocorrências', to: `/app/${eventId}/occurrences`, icon: AlertTriangle },
+        { label: 'Checklist Pré-Abertura', to: `/app/${eventId}/checklist`, icon: ShieldCheck },
+        { label: 'Mesas & Cadeiras', to: `/app/${eventId}/tables`, icon: Grid },
+        { label: 'Check-in Recepção', to: `/app/${eventId}/checkin`, icon: CheckCircle2 },
+        { label: 'Homenageados (30)', to: `/app/${eventId}/honorees`, icon: Award },
+        { label: 'Buffet & Telão', to: `/app/${eventId}/buffet`, icon: Sparkles },
+        { label: 'Convidados (~400)', to: `/app/${eventId}/guests`, icon: Users },
+        { label: 'Protocolo Palco', to: `/app/${eventId}/timeline`, icon: Clock },
+        { label: 'Equipes & Staff (68)', to: `/app/${eventId}/teams`, icon: ShieldCheck },
+        {
+          label: 'Ocorrências & Auditoria',
+          to: `/app/${eventId}/occurrences`,
+          icon: AlertTriangle,
+        },
       ]
     : []
 

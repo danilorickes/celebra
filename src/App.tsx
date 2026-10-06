@@ -18,16 +18,17 @@ import ConfirmEmailChange from '@/pages/ConfirmEmailChange'
 // Celebra App Pages
 import EventSelect from '@/pages/EventSelect'
 import Dashboard from '@/pages/Dashboard'
-import Honorees from '@/pages/Honorees'
-import Guests from '@/pages/Guests'
 import Tables from '@/pages/Tables'
-import Checkin from '@/pages/Checkin'
-import Timeline from '@/pages/Timeline'
+import Guests from '@/pages/Guests'
+import Honorees from '@/pages/Honorees'
 import Teams from '@/pages/Teams'
+import Timeline from '@/pages/Timeline'
 import Occurrences from '@/pages/Occurrences'
 import Live from '@/pages/Live'
+import Checkin from '@/pages/Checkin'
+import Checklist from '@/pages/Checklist'
+import Buffet from '@/pages/Buffet'
 import NotFound from '@/pages/NotFound'
-
 const queryClient = new QueryClient()
 
 const App = () => (
@@ -64,6 +65,8 @@ const App = () => (
               <Route path=":eventId/guests" element={<Guests />} />
               <Route path=":eventId/tables" element={<Tables />} />
               <Route path=":eventId/checkin" element={<Checkin />} />
+              <Route path=":eventId/checklist" element={<Checklist />} />
+              <Route path=":eventId/buffet" element={<Buffet />} />
               <Route path=":eventId/timeline" element={<Timeline />} />
               <Route path=":eventId/teams" element={<Teams />} />
               <Route path=":eventId/occurrences" element={<Occurrences />} />
