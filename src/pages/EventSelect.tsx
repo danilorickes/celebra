@@ -89,63 +89,83 @@ export default function EventSelect() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 lg:py-12">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:py-12 text-[#F6F4F0]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#C5A45F] font-semibold mb-1">
             <Sparkles className="w-4 h-4" /> Multi-Evento Operacional
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1A17] font-serif">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-serif">
             Selecione o Evento Operacional
           </h1>
-          <p className="text-sm text-[#6B6356] mt-1">
+          <p className="text-sm text-neutral-400 mt-1">
             Escolha o evento que a equipe do cerimonial irá operar hoje.
           </p>
         </div>
 
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
           <DialogTrigger asChild>
-            <Button className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold gap-2 shadow-sm">
+            <Button className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-semibold gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(197,164,95,0.3)] h-11 min-h-[44px] px-5 rounded-xl">
               <Plus className="w-4 h-4" /> Criar Novo Evento
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[460px] bg-white">
+          <DialogContent className="sm:max-w-[460px] bg-[#161412] border-[#29241E] text-[#F6F4F0] shadow-2xl">
             <form onSubmit={handleCreateEvent}>
               <DialogHeader>
-                <DialogTitle className="font-serif text-xl">Novo Evento</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="font-serif text-xl text-white">Novo Evento</DialogTitle>
+                <DialogDescription className="text-neutral-400">
                   Adicione um novo evento para gerenciar homenageados, mesas e protocolos.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="event-name">Nome do Evento</Label>
+                  <Label
+                    htmlFor="event-name"
+                    className="text-neutral-300 text-xs uppercase tracking-wider font-medium"
+                  >
+                    Nome do Evento
+                  </Label>
                   <Input
                     id="event-name"
                     required
                     placeholder="Ex: Baile de Gala 2026"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    className="bg-[#1A1816] border-[#312B22] text-white focus:border-[#C5A45F] focus:ring-[#C5A45F]/30 h-11 rounded-xl text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="event-date">Data do Evento</Label>
+                  <Label
+                    htmlFor="event-date"
+                    className="text-neutral-300 text-xs uppercase tracking-wider font-medium"
+                  >
+                    Data do Evento
+                  </Label>
                   <Input
                     id="event-date"
                     type="date"
                     required
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
+                    className="bg-[#1A1816] border-[#312B22] text-white focus:border-[#C5A45F] focus:ring-[#C5A45F]/30 h-11 rounded-xl text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="event-profile">Perfil do Evento</Label>
+                  <Label
+                    htmlFor="event-profile"
+                    className="text-neutral-300 text-xs uppercase tracking-wider font-medium"
+                  >
+                    Perfil do Evento
+                  </Label>
                   <Select value={profile} onValueChange={setProfile}>
-                    <SelectTrigger id="event-profile">
+                    <SelectTrigger
+                      id="event-profile"
+                      className="bg-[#1A1816] border-[#312B22] text-white focus:border-[#C5A45F] focus:ring-[#C5A45F]/30 h-11 rounded-xl text-sm"
+                    >
                       <SelectValue placeholder="Selecione o perfil" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1A1816] border-[#312B22] text-[#F6F4F0]">
                       <SelectItem value="Elegante">Elegante / Solenidade</SelectItem>
                       <SelectItem value="Corporativo">Corporativo / Premiação</SelectItem>
                       <SelectItem value="Casamento">Casamento Luxo</SelectItem>
@@ -154,19 +174,20 @@ export default function EventSelect() {
                   </Select>
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="gap-2 sm:gap-0">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpenCreate(false)}
                   disabled={isSubmitting}
+                  className="bg-[#1A1816] border-[#312B22] text-neutral-300 hover:text-white hover:bg-[#211E1B] h-11 rounded-xl"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+                  className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-semibold h-11 rounded-xl shadow-md"
                 >
                   {isSubmitting ? 'Salvando...' : 'Salvar e Acessar'}
                 </Button>
@@ -180,21 +201,21 @@ export default function EventSelect() {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#C5A45F] border-t-transparent" />
-          <p className="text-sm text-[#6B6356]">Carregando eventos cadastrados...</p>
+          <p className="text-sm text-neutral-400">Carregando eventos cadastrados...</p>
         </div>
       ) : events.length === 0 ? (
-        <Card className="text-center py-16 border-dashed bg-white">
+        <Card className="text-center py-16 border-dashed border-[#29241E] bg-[#161412] text-[#F6F4F0] rounded-2xl">
           <CardContent>
-            <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4 text-[#6B6356]">
+            <div className="w-12 h-12 rounded-full bg-[#1A1816] border border-[#312B22] flex items-center justify-center mx-auto mb-4 text-[#C5A45F]">
               <Calendar className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-semibold text-[#221E1A]">Nenhum evento encontrado</h3>
-            <p className="text-sm text-[#6B6356] max-w-sm mx-auto mt-1 mb-6">
+            <h3 className="text-lg font-semibold text-white">Nenhum evento encontrado</h3>
+            <p className="text-sm text-neutral-400 max-w-sm mx-auto mt-1 mb-6">
               Comece cadastrando o evento principal para iniciar a operação do cerimonial.
             </p>
             <Button
               onClick={() => setOpenCreate(true)}
-              className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold"
+              className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-semibold h-11 px-5 rounded-xl shadow-md"
             >
               Criar Primeiro Evento
             </Button>
@@ -218,14 +239,14 @@ export default function EventSelect() {
               <Card
                 key={ev.id}
                 onClick={() => navigate(`/app/${ev.id}/dashboard`)}
-                className={`relative cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-xl border ${
+                className={`relative cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl border rounded-2xl ${
                   isMainPilot
-                    ? 'border-[#C5A45F] bg-gradient-to-br from-[#1C1A17] to-[#2B2722] text-white'
-                    : 'border-neutral-200 bg-white hover:border-[#C5A45F]'
+                    ? 'border-[#C5A45F] bg-gradient-to-br from-[#161412] via-[#1A1816] to-[#211E1B] text-[#F6F4F0] ring-1 ring-[#C5A45F]/30 shadow-[0_0_20px_rgba(197,164,95,0.12)]'
+                    : 'border-[#29241E] bg-[#161412] hover:border-[#C5A45F]/60 hover:bg-[#1A1816] text-[#F6F4F0]'
                 }`}
               >
                 {isMainPilot && (
-                  <div className="absolute top-4 right-4 bg-[#C5A45F] text-[#1C1A17] text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow">
+                  <div className="absolute top-4 right-4 bg-[#C5A45F] text-[#141210] text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow">
                     <Sparkles className="w-3 h-3 fill-current" /> Evento Piloto Real
                   </div>
                 )}
@@ -235,12 +256,10 @@ export default function EventSelect() {
                     <Calendar className="w-3.5 h-3.5" />
                     {formattedDate}
                   </div>
-                  <CardTitle
-                    className={`text-xl font-serif font-bold mt-1 ${isMainPilot ? 'text-white' : 'text-[#1C1A17]'}`}
-                  >
+                  <CardTitle className="text-xl font-serif font-bold mt-1 text-white">
                     {ev.name}
                   </CardTitle>
-                  <CardDescription className={isMainPilot ? 'text-neutral-400' : 'text-[#6B6356]'}>
+                  <CardDescription className="text-neutral-400">
                     Perfil:{' '}
                     <span className="font-medium text-neutral-200">{ev.profile || 'Elegante'}</span>{' '}
                     • Status: <span className="text-emerald-400 font-semibold">{ev.status}</span>
@@ -248,9 +267,7 @@ export default function EventSelect() {
                 </CardHeader>
 
                 <CardContent className="pt-2">
-                  <div
-                    className={`flex items-center justify-between pt-4 border-t ${isMainPilot ? 'border-[#3D3833]' : 'border-neutral-100'}`}
-                  >
+                  <div className="flex items-center justify-between pt-4 border-t border-[#29241E]">
                     <div className="flex items-center gap-4 text-xs">
                       <span className="flex items-center gap-1.5 text-neutral-400">
                         <Users className="w-4 h-4 text-[#C5A45F]" />
@@ -262,9 +279,7 @@ export default function EventSelect() {
                       </span>
                     </div>
 
-                    <div
-                      className={`inline-flex items-center gap-1 text-xs font-semibold ${isMainPilot ? 'text-[#C5A45F]' : 'text-[#C5A45F]'}`}
-                    >
+                    <div className="inline-flex items-center gap-1 text-xs font-semibold text-[#C5A45F] group-hover:text-[#E5C989]">
                       Acessar Central <ArrowRight className="w-3.5 h-3.5" />
                     </div>
                   </div>

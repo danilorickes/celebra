@@ -42,15 +42,15 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[#1C1A17] p-4 text-[#F8F7F4] relative overflow-hidden">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[#0F0E0D] p-4 text-[#F6F4F0] relative overflow-hidden">
       {/* Decorative ambient background */}
       <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#C5A45F]/10 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#C5A45F]/5 blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#C5A45F] to-[#E5C989] text-[#1C1A17] shadow-xl mb-4">
-            <Sparkles className="w-7 h-7" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#C5A45F] to-[#E5C989] text-[#141210] shadow-[0_0_25px_rgba(197,164,95,0.35)] mb-4 ring-1 ring-[#C5A45F]/40">
+            <Sparkles className="w-7 h-7 fill-current" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white font-serif">CELEBRA</h1>
           <p className="text-xs uppercase tracking-widest text-[#C5A45F] mt-1 font-semibold">
@@ -61,7 +61,7 @@ export default function Login() {
           </p>
         </div>
 
-        <Card className="bg-[#26231F] border-[#3D3833] text-[#F8F7F4] shadow-2xl">
+        <Card className="bg-[#161412] border-[#29241E] text-[#F6F4F0] shadow-2xl">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl font-semibold text-white">Entrar na Central</CardTitle>
             <CardDescription className="text-neutral-400">
@@ -77,7 +77,10 @@ export default function Login() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-neutral-300 flex items-center gap-2">
+                <Label
+                  htmlFor="email"
+                  className="text-neutral-300 flex items-center gap-2 text-xs uppercase tracking-wider font-medium"
+                >
                   <Mail className="w-4 h-4 text-[#C5A45F]" /> E-mail
                 </Label>
                 <Input
@@ -87,18 +90,21 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="exemplo@cerimonial.com"
-                  className="bg-[#1C1A17] border-[#443E38] text-white focus:border-[#C5A45F] h-11"
+                  className="bg-[#1A1816] border-[#312B22] text-white focus:border-[#C5A45F] focus:ring-[#C5A45F]/30 h-12 min-h-[48px] rounded-xl text-sm"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-neutral-300 flex items-center gap-2">
+                  <Label
+                    htmlFor="password"
+                    className="text-neutral-300 flex items-center gap-2 text-xs uppercase tracking-wider font-medium"
+                  >
                     <Lock className="w-4 h-4 text-[#C5A45F]" /> Senha
                   </Label>
                   <Link
                     to="/forgot-password"
-                    className="text-xs text-[#C5A45F] hover:underline font-medium"
+                    className="text-xs text-[#C5A45F] hover:text-[#E5C989] hover:underline font-medium min-h-[32px] inline-flex items-center"
                   >
                     Esqueceu a senha?
                   </Link>
@@ -110,38 +116,40 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="bg-[#1C1A17] border-[#443E38] text-white focus:border-[#C5A45F] h-11"
+                  className="bg-[#1A1816] border-[#312B22] text-white focus:border-[#C5A45F] focus:ring-[#C5A45F]/30 h-12 min-h-[48px] rounded-xl text-sm"
                 />
               </div>
 
-              <div className="bg-[#1C1A17]/80 rounded-lg p-3 border border-[#3D3833] text-xs text-neutral-400">
-                <span className="text-[#C5A45F] font-semibold">
-                  Acesso de Demonstração Operacional:
+              <div className="bg-[#1A1816] rounded-xl p-3.5 border border-[#312B22] text-xs text-neutral-400">
+                <span className="text-[#C5A45F] font-semibold flex items-center gap-1.5 mb-1">
+                  <Sparkles className="w-3.5 h-3.5" /> Acesso de Demonstração Operacional
                 </span>
-                <br />
                 Utilize a sua credencial cadastrada ou crie uma nova conta em "Criar conta". Para o
                 ambiente de homologação, utilize as credenciais fornecidas privadamente pela
                 coordenação da demonstração.
               </div>
             </CardContent>
 
-            <CardFooter className="flex flex-col gap-3 pt-2">
+            <CardFooter className="flex flex-col gap-3 pt-2 pb-6">
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-[#C5A45F] hover:bg-[#B08F4A] text-[#1C1A17] font-semibold h-12 text-base transition-all shadow-md"
+                className="w-full bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-semibold h-12 min-h-[48px] text-base transition-all shadow-lg hover:shadow-[0_0_20px_rgba(197,164,95,0.3)] rounded-xl"
               >
                 {isLoading ? (
                   'Entrando...'
                 ) : (
-                  <span className="inline-flex items-center gap-2">
+                  <span className="inline-flex items-center gap-2 font-bold">
                     Entrar no Painel <ArrowRight className="w-4 h-4" />
                   </span>
                 )}
               </Button>
               <div className="text-center text-xs text-neutral-400 mt-2">
                 Novo cerimonialista?{' '}
-                <Link to="/signup" className="text-[#C5A45F] hover:underline font-semibold">
+                <Link
+                  to="/signup"
+                  className="text-[#C5A45F] hover:text-[#E5C989] hover:underline font-semibold py-2 px-1 inline-block"
+                >
                   Criar conta
                 </Link>
               </div>

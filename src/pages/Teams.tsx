@@ -42,6 +42,11 @@ export default function Teams() {
   const [suppliers, setSuppliers] = useState<SupplierRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
+  // Team Dialog
+  const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false)
+  const [newTeamName, setNewTeamName] = useState('')
+  const [isSubmittingTeam, setIsSubmittingTeam] = useState(false)
+
   // Member Dialog
   const [isMemberDialogOpen, setIsMemberDialogOpen] = useState(false)
   const [selectedTeamId, setSelectedTeamId] = useState('')
@@ -84,6 +89,27 @@ export default function Teams() {
   useEffect(() => {
     loadData()
   }, [eventId])
+
+  // Add Team
+  const handleAddTeam = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!eventId || !newTeamName.trim()) return
+    setIsSubmittingTeam(true)
+    try {
+      await teamService.create({
+        event_id: eventId,
+        name: newTeamName.trim(),
+      })
+      toast({ title: 'Equipe criada com sucesso!' })
+      setIsTeamDialogOpen(false)
+      setNewTeamName('')
+      loadData()
+    } catch (_) {
+      toast({ title: 'Erro ao criar equipe', variant: 'destructive' })
+    } finally {
+      setIsSubmittingTeam(false)
+    }
+  }
 
   // Add Member
   const handleAddMember = async (e: React.FormEvent) => {
@@ -372,6 +398,53 @@ export default function Teams() {
           </div>
         )}
       </div>
+
+      {/* Team Dialog */}
+      <Dialog open={isTeamDialogOpen} onOpenChange={setIsTeamDialogOpen}>
+        <DialogContent className="sm:max-w-[420px] bg-[#161412] text-white border border-[#332D24] rounded-2xl shadow-2xl">
+          <form onSubmit={handleAddTeam}>
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl">Nova Equipe</DialogTitle>
+              <DialogDescription>
+                Cadastre uma equipe de apoio ou setor do evento.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4 text-sm">
+              <div className="space-y-2">
+                <Label htmlFor="t-name">Nome da Equipe *</Label>
+                <Input
+                  id="t-name"
+                  required
+                  placeholder="Ex: Recepção e Credenciamento"
+                  value={newTeamName}
+                  onChange={(e) => setNewTeamName(e.target.value)}
+                  className="bg-[#1A1816] border-[#312B22] text-white focus:border-[#C5A45F]"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsTeamDialogOpen(false)}
+                disabled={isSubmittingTeam}
+                className="bg-[#1A1816] border-[#312B22] text-neutral-300 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmittingTeam}
+                className="bg-[#C5A45F] hover:bg-[#B08F4A] text-[#141210] font-bold rounded-xl"
+              >
+                {isSubmittingTeam ? 'Salvando...' : 'Salvar Equipe'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Member Dialog */}
       <Dialog open={isMemberDialogOpen} onOpenChange={setIsMemberDialogOpen}>
